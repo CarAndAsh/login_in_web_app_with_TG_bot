@@ -4,4 +4,16 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "fastapi>=0.116.1",
+    "fastapi-jsonapi>=3.0.0",
+    "pydantic-settings>=2.10.1",
+    "pydantic[email]>=2.11.7",
+    "sqlalchemy[asyncio]>=2.0.43",
+    "uvicorn>=0.35.0",
+]
+
+[dependency-groups]
+dev = [
+    "uv>=0.8.11",
+]
