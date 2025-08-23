@@ -1,0 +1,44 @@
+import logging
+from logging import Formatter
+from pathlib import Path
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BOT_DIR = Path(__name__).resolve().parent
+BASE_DIR = BOT_DIR.parent
+
+LOG_DEFAULT_FORMAT = '{levelname}\t[{asctime}]\t{name}: {lineno}\t{filename}\t{message}'
+
+
+class LogConfig(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    log_level: Literal['debug', 'info', 'warning', 'error', 'critical'] = 'info'
+    formatter: Formatter = Formatter(fmt=LOG_DEFAULT_FORMAT, style='{')
+
+    @property
+    def get_log_lvl(self) -> int:
+        return logging.getLevelNamesMapping()[self.log_level]
+
+
+class RegBotConfig(BaseModel):
+    token: str
+    name: str = 'Рег-бот'
+    short_desc: str = 'Бот для регистрации'
+    description: str = 'Данный бот передает данные в веб-приложение для автоматической регистрации в нем'
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=(BOT_DIR / '.reg_bot_env'),
+        env_nested_delimiter='-',
+        env_prefix='TG-'
+
+    )
+    log: LogConfig = LogConfig()
+    reg_bot: RegBotConfig
+
+
+settings = Settings()
+print(BASE_DIR)
