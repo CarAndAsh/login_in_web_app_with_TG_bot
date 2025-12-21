@@ -1,0 +1,7 @@
+/.venv
+/venv
+/book
+docker-compose.yml
+__pycache__
+/.idea
+.bot_tokens
