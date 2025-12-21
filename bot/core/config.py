@@ -6,7 +6,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BOT_DIR = Path(__name__).resolve().parent
+BOT_DIR = Path(__name__).resolve().parent.parent
 BASE_DIR = BOT_DIR.parent
 
 LOG_DEFAULT_FORMAT = '{levelname}\t[{asctime}]\t{name}: {lineno}\t{filename}\t{message}'
@@ -31,14 +31,12 @@ class RegBotConfig(BaseModel):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(BOT_DIR / '.reg_bot_env'),
+        env_file=BASE_DIR / '.env',
         env_nested_delimiter='-',
-        env_prefix='TG-'
-
+        extra='ignore'
     )
     log: LogConfig = LogConfig()
     reg_bot: RegBotConfig
 
 
 settings = Settings()
-print(BASE_DIR)
