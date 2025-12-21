@@ -1,7 +1,7 @@
 from aiogram import Router
 from aiogram.types import Message
 
-from bot_core.log_cofig import logger
+from bot.bot_core.log_cofig import logger
 
 other_router: Router = Router()
 

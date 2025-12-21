@@ -2,10 +2,10 @@ from asyncio import run
 
 from aiogram import Bot, Dispatcher
 
-from bot_core.config import settings
-from bot_core.log_cofig import logger
-from handlers.other import other_router
-from lexicon.lexicon_ru import BOT_INFO
+from bot.bot_core.config import settings
+from bot.bot_core.log_cofig import logger
+from bot.handlers.other import other_router
+from bot.lexicon.lexicon_ru import BOT_INFO
 
 logger.name = __file__
 

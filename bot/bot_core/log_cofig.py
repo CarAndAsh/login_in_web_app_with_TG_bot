@@ -2,7 +2,7 @@ import os
 from logging import getLogger, DEBUG, Formatter, StreamHandler, FileHandler
 from sys import stdout
 
-from bot_core.config import settings, BASE_DIR
+from bot.bot_core.config import settings, BASE_DIR
 
 formatter = Formatter(fmt=settings.log.log_format)
 formatter.default_msec_format = settings.log.log_msec_format
