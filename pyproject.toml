@@ -16,5 +16,5 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "uv>=0.8.11",
+    "uv>=0.9.18",
 ]
