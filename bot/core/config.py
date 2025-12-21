@@ -24,10 +24,6 @@ class LogConfig(BaseModel):
 
 class RegBotConfig(BaseModel):
     token: str
-    name: str = 'Рег-бот'
-    short_desc: str = 'Бот для регистрации'
-    description: str = 'Данный бот передает данные в веб-приложение для автоматической регистрации в нем'
-
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
