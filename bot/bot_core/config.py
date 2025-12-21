@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 import logging
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 LOG_DEFAULT_FORMAT = "[%(asctime)s] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
 
 
@@ -31,7 +31,7 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra='ignore'
     )
-    tg_bot: TGBotSettings
+    reg_bot: TGBotSettings
     log: LogSettings = LogSettings()
 
 

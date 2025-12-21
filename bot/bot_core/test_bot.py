@@ -18,12 +18,12 @@ async def name_and_desc_check_and_set(bot: Bot):
         await bot.set_my_name(name)
     if bot_short_desc != (short_desc := BOT_INFO['short_desc']):
         await bot.set_my_short_description(short_desc)
-    if bot_desc != (desc := BOT_INFO['desc']):
+    if bot_desc != (desc := BOT_INFO['description']):
         await bot.set_my_description(desc)
 
 
 async def main():
-    bot = Bot(settings.tg_bot.token, short_descripton='Базовый бот')
+    bot = Bot(settings.reg_bot.token, short_descripton='Базовый бот')
     logger.info('Конфигурация загружена')
     await name_and_desc_check_and_set(bot)
     dp = Dispatcher()
