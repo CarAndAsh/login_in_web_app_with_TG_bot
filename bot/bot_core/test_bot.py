@@ -5,6 +5,7 @@ from aiogram import Bot, Dispatcher
 from bot.bot_core.config import settings
 from bot.bot_core.log_cofig import logger
 from bot.handlers.other import other_router
+from bot.keyboards.menu import command_list
 from bot.lexicon.lexicon_ru import BOT_INFO
 
 logger.name = __file__
@@ -24,10 +25,12 @@ async def name_and_desc_check_and_set(bot: Bot):
 
 async def main():
     bot = Bot(settings.reg_bot.token, short_descripton='Базовый бот')
+    # await name_and_desc_check_and_set(bot)
+    await bot.set_my_commands(command_list)
     logger.info('Конфигурация загружена')
-    await name_and_desc_check_and_set(bot)
     dp = Dispatcher()
     dp.include_router(other_router)
+    await bot.delete_webhook(drop_pending_updates=False)
     await dp.start_polling(bot)
 
 
