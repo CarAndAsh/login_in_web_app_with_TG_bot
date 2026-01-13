@@ -1,10 +1,11 @@
 [project]
 name = "login-in-web-app-with-tg-bot"
 version = "0.1.0"
-description = "Add your description here"
+description = "At start it's simple app to show user data from Telegram by using bot"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiogram>=3.22.0",
     "fastapi>=0.116.1",
     "fastapi-jsonapi>=3.0.0",
     "pydantic-settings>=2.10.1",
@@ -15,5 +16,5 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "uv>=0.8.11",
+    "uv>=0.9.18",
 ]
