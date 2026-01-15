@@ -6,3 +6,4 @@
 
 #### ***другие***:
 - https://docs.astral.sh/uv/
+- https://www.jwt.io/
