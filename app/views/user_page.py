@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from app.core.config import settings
+from app.core.app_config import settings
 
 router = APIRouter(include_in_schema=False, prefix='/user_page')
 
