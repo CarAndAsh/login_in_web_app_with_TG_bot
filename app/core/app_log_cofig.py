@@ -12,10 +12,10 @@ stream.setFormatter(formatter)
 
 if 'logs' not in os.listdir(BASE_DIR):
     os.mkdir(BASE_DIR / 'logs')
-to_file = FileHandler(BASE_DIR / 'logs' / '.log.txt', 'w', encoding='utf-8')
+to_file = FileHandler(BASE_DIR / 'logs' / '.app_log.txt', 'w', encoding='utf-8')
 to_file.setFormatter(formatter)
 
-logger = getLogger()
-logger.level = DEBUG
-logger.addHandler(stream)
-logger.addHandler(to_file)
+app_logger = getLogger('app_loger')
+app_logger.level = DEBUG
+app_logger.addHandler(stream)
+app_logger.addHandler(to_file)
