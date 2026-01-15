@@ -1,5 +1,3 @@
-from asyncio import run
-
 from aiogram import Bot, Dispatcher
 
 from bot.bot_core.config import settings
@@ -23,7 +21,7 @@ async def name_and_desc_check_and_set(bot: Bot):
         await bot.set_my_description(desc)
 
 
-async def main():
+async def start_bot():
     bot = Bot(settings.reg_bot.token, short_descripton='Базовый бот')
     # await name_and_desc_check_and_set(bot)
     await bot.set_my_commands(command_list)
@@ -34,7 +32,3 @@ async def main():
     bot_logger.debug('Бот запущен')
     await dp.start_polling(bot)
 
-
-if __name__ == '__main__':
-    logger.debug('Бот запущен')
-    run(main())
