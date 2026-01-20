@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, AnyUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 import logging
@@ -24,6 +24,7 @@ class TGBotSettings(BaseModel):
     token: str
 
 
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / '.env',
@@ -33,6 +34,6 @@ class Settings(BaseSettings):
     )
     reg_bot: TGBotSettings
     log: LogSettings = LogSettings()
-
+    outer_url: str
 
 settings = Settings()
