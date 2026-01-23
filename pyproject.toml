@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "aiogram>=3.22.0",
+    "aiosqlite>=0.22.1",
+    "alembic>=1.18.1",
     "fastapi>=0.116.1",
     "fastapi-jsonapi>=3.0.0",
     "jinja2>=3.1.6",
