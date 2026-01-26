@@ -20,6 +20,24 @@ class LogSettings(BaseModel):
         return logging.getLevelNamesMapping()[self.log_level.upper()]
 
 
+class DBConfig(BaseModel):
+    name : str
+    echo: bool = False
+    echo_pool: bool = False
+    max_overflow: int = 10
+    pool_size: int = 5
+    naming_convention: dict[str, str] = {
+        "ix": "ix_%(column_0_label)s",
+        "uq": "uq_%(table_name)s_%(column_0_N_name)s",
+        "ck": "ck_%(table_name)s_%(constraint_name)s",
+        "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+        "pk": "pk_%(table_name)s",
+    }
+
+    @property
+    def url(self) -> str:
+        return f'sqlite+aiosqlite:///{self.name}'
+
 class RunConfig(BaseModel):
     host: str
     port: int
@@ -33,6 +51,7 @@ class Settings(BaseSettings):
         extra='allow'
     )
     run: RunConfig
+    db: DBConfig
     log: LogSettings = LogSettings()
     templates: Jinja2Templates = Jinja2Templates(APP_DIR / 'app' / 'templates')
 
