@@ -1,7 +1,8 @@
 from sqlalchemy import MetaData
-from sqlalchemy.orm import DeclarativeBase, declared_attr
+from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 
 from app.core.app_config import settings
+from app.models.mixins.id_int_pk import IdIntPkMixin
 
 
 class Base(DeclarativeBase):
@@ -12,3 +13,11 @@ class Base(DeclarativeBase):
     def __tablename__(cls) -> str:
         return f'{cls.__name__.lower()}s'
 
+
+class User(IdIntPkMixin, Base):
+    telegram_id: Mapped[int]
+    is_bot: Mapped[bool]
+    first_name: Mapped[str] = mapped_column(nullable=True)
+    last_name: Mapped[str] = mapped_column(nullable=True)
+    username: Mapped[str] = mapped_column(unique=True)
+    language_code: Mapped[str] = mapped_column()
