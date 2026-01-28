@@ -13,6 +13,8 @@ class Base(DeclarativeBase):
     def __tablename__(cls) -> str:
         return f'{cls.__name__.lower()}s'
 
+    def to_dict(self):
+        return {k:v for k, v in self.__dict__.items() if not k.startswith('_')}
 
 class User(IdIntPkMixin, Base):
     telegram_id: Mapped[int]
