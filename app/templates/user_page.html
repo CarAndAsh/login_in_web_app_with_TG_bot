@@ -1,1 +1,9 @@
 {% extends 'base.html' %}
+{% block title %}
+User page
+{% endblock title %}
+{% block body %}
+    {% for val in [telegram_id, username, first_name, last_name, is_bot] %}
+        {{ val }}
+    {% endfor %}
+{% endblock body %}
