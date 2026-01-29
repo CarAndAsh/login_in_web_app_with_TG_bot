@@ -10,3 +10,4 @@
 - https://alembic.sqlalchemy.org/en/latest/cookbook.html#using-asyncio-with-alembic
 - https://fastapi.tiangolo.com/advanced/events/
 - https://aiosqlite.omnilib.dev/en/stable/
+- https://fastapi-users.github.io/fastapi-users/latest/configuration/overview/
