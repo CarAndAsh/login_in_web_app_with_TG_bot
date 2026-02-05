@@ -7,7 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi.templating import Jinja2Templates
 
 APP_DIR = Path(__name__).resolve().parent
-LOG_DEFAULT_FORMAT = "[%(asctime)s] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
+LOG_DEFAULT_FORMAT = "APP [%(asctime)s] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
 
 
 class LogSettings(BaseModel):

@@ -1,12 +1,16 @@
+from logging import getLogger, config as logger_config
+
 from aiogram import Bot, Dispatcher
 
-from bot.bot_core.config import settings
-from bot.bot_core.bot_log_cofig import bot_logger
-from bot.handlers.other import other_router
-from bot.keyboards.menu import command_list
-from bot.lexicon.lexicon_ru import BOT_INFO
+from .bot_core.bot_log_cofig import log_config_dict
+from .bot_core.config import settings
+from .handlers.other import other_router
+from .keyboards.menu import command_list
+from .lexicon.lexicon_ru import BOT_INFO
 
-bot_logger.name = __file__
+# TODO something with recording logs in both files
+log = getLogger(__name__)
+logger_config.dictConfig(log_config_dict)
 
 
 async def name_and_desc_check_and_set(bot: Bot):
@@ -19,16 +23,16 @@ async def name_and_desc_check_and_set(bot: Bot):
         await bot.set_my_short_description(short_desc)
     if bot_desc != (desc := BOT_INFO['description']):
         await bot.set_my_description(desc)
+    # log.info('Произведена настройка описания бота')
 
 
 async def start_bot():
+
     bot = Bot(settings.reg_bot.token, short_descripton='Базовый бот')
     # await name_and_desc_check_and_set(bot)
     await bot.set_my_commands(command_list)
-    bot_logger.info('Конфигурация загружена')
     dp = Dispatcher()
     dp.include_router(other_router)
     await bot.delete_webhook(drop_pending_updates=False)
-    bot_logger.debug('Бот запущен')
+    log.info('Бот запущен')
     await dp.start_polling(bot)
-

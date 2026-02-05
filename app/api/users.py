@@ -1,4 +1,5 @@
 import json
+from logging import getLogger
 from typing import Annotated
 
 from fastapi import Request, APIRouter, Depends
@@ -11,6 +12,7 @@ from app.crud import users_crud
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
+log =  getLogger(__name__)
 
 @router.post('/', name='user_page', response_model=ReadUserSchema)
 async def add_user_data_by_tg_bot(req: Request, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
@@ -23,6 +25,7 @@ async def add_user_data_by_tg_bot(req: Request, session: Annotated[AsyncSession,
 
 @router.get('/', name='users', response_model=list[UserSchema])
 async def get_all_users(session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+    log.info('you get all users list')
     return await users_crud.get_all_users(session)
 
 

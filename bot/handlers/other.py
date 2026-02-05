@@ -1,15 +1,17 @@
+from logging import getLogger
+
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiohttp import request
 
-from bot.bot_core.bot_log_cofig import bot_logger
 from bot.bot_core.config import settings
 from bot.keyboards.keyboards import reply_keyboard
 from bot.lexicon.lexicon_ru import BOT_BTN, BOT_INFO
 
 other_router: Router = Router()
 
+log = getLogger(__name__)
 
 @other_router.message(CommandStart())
 async def startup(msg: Message):
@@ -33,5 +35,5 @@ async def startup(msg: Message):
 @other_router.message()
 async def echo(msg: Message):
     if msg.text:
-        bot_logger.info(f'Поступило сообщение: {msg.text}')
+        log.info(f'Поступило сообщение: {msg.text}')
         await msg.answer(msg.text)

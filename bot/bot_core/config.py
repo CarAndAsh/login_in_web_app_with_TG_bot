@@ -1,13 +1,13 @@
 from pathlib import Path
 from typing import Literal
 
-from pydantic import BaseModel, AnyUrl
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 import logging
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-LOG_DEFAULT_FORMAT = "[%(asctime)s] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
+LOG_DEFAULT_FORMAT = "BOT [%(asctime)s] %(module)10s:%(lineno)-3d %(levelname)-7s - %(message)s"
 
 
 class LogSettings(BaseModel):

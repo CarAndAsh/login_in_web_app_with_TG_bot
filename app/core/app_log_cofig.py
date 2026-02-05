@@ -1,21 +1,52 @@
 import os
-from logging import getLogger, DEBUG, Formatter, StreamHandler, FileHandler
 from sys import stdout
 
-from bot.bot_core.config import settings, BASE_DIR
+from app.core.app_config import settings, APP_DIR
 
-formatter = Formatter(fmt=settings.log.log_format)
-formatter.default_msec_format = settings.log.log_msec_format
+if 'logs' not in os.listdir():
+    os.mkdir('logs')
 
-stream = StreamHandler(stdout)
-stream.setFormatter(formatter)
+log_config_dict = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'formatter': {
+            'format': settings.log.log_format,
+            'default_msec_format': settings.log.log_msec_format
+        }
+    },
+    'handlers': {
+        'stdout_stream': {
+            'class': 'logging.StreamHandler',
+            'stream': stdout,
+            'formatter': 'formatter'
+        },
+        'to_file': {
+            'class': 'logging.FileHandler',
+            'filename': APP_DIR / 'logs' / '.app_log.txt',
+            'mode': 'w',
+            'encoding': 'utf-8',
+            'formatter': 'formatter'
+        }
+    },
+    'loggers':
+        {
+            'app.api.users': {
+                'level': settings.log.log_level_value,
+                'handlers': ['stdout_stream', 'to_file'],
+            },
+            'app.create_app': {
+                'level': settings.log.log_level_value,
+                'handlers': ['stdout_stream', 'to_file'],
+            },
+            'uvicorn': {
+                'level': settings.log.log_level_value,
+                'handlers': ['stdout_stream', 'to_file'],
+            },
+            'uvicorn.access': {
+                'level': settings.log.log_level_value,
+                'handlers': ['stdout_stream'],
+            }
+        }
 
-if 'logs' not in os.listdir(BASE_DIR):
-    os.mkdir(BASE_DIR / 'logs')
-to_file = FileHandler(BASE_DIR / 'logs' / '.app_log.txt', 'w', encoding='utf-8')
-to_file.setFormatter(formatter)
-
-app_logger = getLogger('app_loger')
-app_logger.level = DEBUG
-app_logger.addHandler(stream)
-app_logger.addHandler(to_file)
+}

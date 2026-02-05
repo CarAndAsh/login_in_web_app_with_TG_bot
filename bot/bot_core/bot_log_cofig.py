@@ -1,21 +1,43 @@
 import os
-from logging import getLogger, DEBUG, Formatter, StreamHandler, FileHandler
 from sys import stdout
 
 from bot.bot_core.config import settings, BASE_DIR
 
-formatter = Formatter(fmt=settings.log.log_format)
-formatter.default_msec_format = settings.log.log_msec_format
+if 'logs' not in os.listdir():
+    os.mkdir('logs')
 
-stream = StreamHandler(stdout)
-stream.setFormatter(formatter)
-
-if 'logs' not in os.listdir(BASE_DIR):
-    os.mkdir(BASE_DIR / 'logs')
-to_file = FileHandler(BASE_DIR / 'logs' / '.bot_log.txt', 'w', encoding='utf-8')
-to_file.setFormatter(formatter)
-
-bot_logger = getLogger('bot_loger')
-bot_logger.level = DEBUG
-bot_logger.addHandler(stream)
-bot_logger.addHandler(to_file)
+log_config_dict = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'formatter': {
+            'format': settings.log.log_format,
+            'default_msec_format': settings.log.log_msec_format
+        }
+    },
+    'handlers': {
+        'to_bot_log_file': {
+            'class': 'logging.FileHandler',
+            'filename': 'logs/.bot_log.txt',
+            'mode': 'w',
+            'encoding': 'utf-8',
+            'formatter': 'formatter'
+        },
+        'stdout_stream': {
+            'class': 'logging.StreamHandler',
+            'stream': stdout,
+            'formatter': 'formatter'
+        }
+    },
+    'loggers':
+        {
+            'bot.test_bot': {
+                'level': settings.log.log_level_value,
+                'handlers': ['stdout_stream', 'to_bot_log_file'],
+            },
+            'bot.handlers.other': {
+                'level': settings.log.log_level_value,
+                'handlers': ['stdout_stream', 'to_bot_log_file'],
+            }
+        }
+}

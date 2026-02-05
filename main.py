@@ -1,7 +1,7 @@
 import asyncio
 
 from app.create_app import start_web_app
-from bot.bot_core.test_bot import start_bot
+from bot.test_bot import start_bot
 
 
 async def main():
