@@ -18,11 +18,6 @@ async def get_user(session: AsyncSession, user_id: int) -> User | None:
     return await session.get(User, user_id)
 
 
-async def get_user_by_tg_id(session: AsyncSession, user_tg_id) -> User | None:
-    query = await session.execute(select(User).filter(User.telegram_id == user_tg_id))
-    return query.scalar()
-
-
 async def get_all_users(session: AsyncSession) -> Sequence[User]:
     query = await session.scalars(select(User).order_by(User.id))
     return query.all()
