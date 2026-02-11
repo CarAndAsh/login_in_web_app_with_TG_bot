@@ -14,12 +14,12 @@ other_router: Router = Router()
 log = getLogger(__name__)
 
 @other_router.message(CommandStart())
-async def startup(msg: Message):
+async def startup(msg: Message) -> None:
     await msg.answer('Для входа на сайт нажмите кнопку ниже 👇', reply_markup=reply_keyboard)
 
 
 @other_router.message(F.text == BOT_BTN['get_info'])
-async def get_user_data(msg: Message):
+async def get_user_data(msg: Message) -> None:
     user_info = msg.from_user.model_dump_json(
         include={'id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code'}
     )
@@ -28,12 +28,12 @@ async def get_user_data(msg: Message):
     await msg.answer('Данные для регистрации переданы. Добро пожаловать!', reply_markup=ReplyKeyboardRemove())
 
 @other_router.message(Command('info'))
-async def startup(msg: Message):
+async def info(msg: Message) -> None:
     await msg.answer(BOT_INFO['description']+'\nДля входа на сайт нажмите кнопку ниже 👇', reply_markup=reply_keyboard)
 
 
 @other_router.message()
-async def echo(msg: Message):
+async def echo(msg: Message) -> None:
     if msg.text:
         log.info(f'Поступило сообщение: {msg.text}')
         await msg.answer(msg.text)
