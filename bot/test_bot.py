@@ -13,7 +13,7 @@ log = getLogger(__name__)
 logger_config.dictConfig(log_config_dict)
 
 
-async def name_and_desc_check_and_set(bot: Bot):
+async def name_and_desc_check_and_set(bot: Bot) -> None:
     bot_name = await bot.get_my_name()
     bot_short_desc = await bot.get_my_short_description()
     bot_desc = await bot.get_my_description()
@@ -26,8 +26,7 @@ async def name_and_desc_check_and_set(bot: Bot):
     # log.info('Произведена настройка описания бота')
 
 
-async def start_bot():
-
+async def start_bot() -> None:
     bot = Bot(settings.reg_bot.token, short_descripton='Базовый бот')
     # await name_and_desc_check_and_set(bot)
     await bot.set_my_commands(command_list)

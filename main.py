@@ -4,7 +4,7 @@ from app.create_app import start_web_app
 from bot.test_bot import start_bot
 
 
-async def main():
+async def main()-> None:
      async with asyncio.TaskGroup() as group:
          group.create_task(start_web_app())
          group.create_task(start_bot())
