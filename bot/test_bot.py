@@ -2,11 +2,11 @@ from logging import getLogger, config as logger_config
 
 from aiogram import Bot, Dispatcher
 
-from .bot_core.bot_log_cofig import log_config_dict
-from .bot_core.config import settings
-from .handlers.other import other_router
-from .keyboards.menu import command_list
-from .lexicon.lexicon_ru import BOT_INFO
+from bot.bot_core.bot_log_cofig import log_config_dict
+from bot.bot_core.config import settings
+from bot.handlers.other import other_router
+from bot.keyboards.menu import command_list
+from bot.lexicon.lexicon_ru import BOT_INFO
 
 # TODO something with recording logs in both files
 log = getLogger(__name__)
