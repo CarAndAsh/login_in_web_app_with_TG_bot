@@ -1,14 +1,14 @@
 import json
 from logging import getLogger
-from typing import Annotated
+from typing import Annotated, Sequence
 
-from fastapi import Request, APIRouter, Depends
+from fastapi import Request, APIRouter, Depends, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.crud.users import get_user_by_tg_id
 from app.models import db_helper
-from app.schemas.user import ReadUserSchema, UserSchema
-from app.crud import users_crud
+from app.schemas.user import UserSchema, UpdateUserSchema, PartialUpdateUserSchema, CreateUserSchema
+from app.crud import users_crud, get_user_by_tg_id
+
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
@@ -23,19 +23,23 @@ async def add_user_data_by_tg_bot(req: Request, session: Annotated[AsyncSession,
     return user
 
 
-@router.get('/', name='users', response_model=list[UserSchema])
-async def get_all_users(session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+@router.get('/', name='users')
+async def get_all_users(
+        session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+) -> Sequence[UserSchema]:
     log.info('you get all users list')
-    return await users_crud.get_all_users(session)
+    users_list = await users_crud.get_all_users(session)
+    return list(map(lambda user: UserSchema.model_validate(user), users_list))
 
 
-@router.get('/{tg_id:int}', name='user_by_telegram_id', response_model=ReadUserSchema | None)
+@router.get('/{tg_id:int}/', name='user_by_telegram_id')
 async def user_page_by_tg_id(
         session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
         tg_id: int
-):
+) -> UserSchema:
     user = await get_user_by_tg_id(session, tg_id)
-    return user
+    return UserSchema.model_validate(user)
+
 
 @router.patch('/user/', name='update_some_user_data_by_telegram_id')
 async def part_update_user_by_tg_id(
