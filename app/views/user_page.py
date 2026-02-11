@@ -5,7 +5,7 @@ from fastapi.params import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.app_config import settings
-from app.crud.users import get_user_by_tg_id
+from app.crud.dependencies import get_user_by_tg_id
 from app.models import db_helper
 
 router = APIRouter(include_in_schema=False, tags=['For_templates',])
