@@ -35,5 +35,6 @@ class Settings(BaseSettings):
     reg_bot: TGBotSettings
     log: LogSettings = LogSettings()
     outer_url: str
+    user_page: str
 
 settings = Settings()
