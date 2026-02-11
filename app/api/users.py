@@ -14,13 +14,22 @@ router = APIRouter(prefix='/users', tags=['Users'])
 
 log =  getLogger(__name__)
 
-@router.post('/', name='user_page', response_model=ReadUserSchema)
-async def add_user_data_by_tg_bot(req: Request, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]):
+
+@router.post('/', name='user_page')
+async def add_user_data_by_tg_bot(
+        req: Request, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
+)-> Response:
     user_data = await req.json()
     user_data = json.loads(user_data)
-    user_data['telegram_id'] = user_data.pop('id')
-    user = await users_crud.create_user(session, user_data)
-    return user
+    user_tg_id = user_data.pop('id')
+    user_data['telegram_id'] = user_tg_id
+    user_for_response = await get_user_by_tg_id(session, user_tg_id)
+    response = Response()
+    if not user_for_response:
+        await users_crud.create_user(session, user_data)
+    else:
+        response.headers['user_tg_id'] = str(user_for_response.telegram_id)
+    return response
 
 
 @router.get('/', name='users')
