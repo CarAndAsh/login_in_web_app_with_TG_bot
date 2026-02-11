@@ -36,3 +36,30 @@ async def user_page_by_tg_id(
 ):
     user = await get_user_by_tg_id(session, tg_id)
     return user
+
+@router.patch('/user/', name='update_some_user_data_by_telegram_id')
+async def part_update_user_by_tg_id(
+        session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+        user_data: Annotated[UserSchema, Depends(get_user_by_tg_id)],
+        user_update: PartialUpdateUserSchema
+) -> UserSchema:
+    user = await users_crud.update_user(session, user_data, user_update, partial=True)
+    return UserSchema.model_validate(user)
+
+
+@router.put('/user/', name='update_user_data_by_telegram_id')
+async def update_user_by_tg_id(
+        session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+        user_data: Annotated[UserSchema, Depends(get_user_by_tg_id)],
+        user_update: UpdateUserSchema
+) -> UserSchema:
+    user = await users_crud.update_user(session, user_data, user_update)
+    return UserSchema.model_validate(user)
+
+
+@router.delete('/user/', name='delete_user_by_telegram_id')
+async def delete_user_by_tg_id(
+        session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+        user_data: Annotated[UserSchema, Depends(get_user_by_tg_id)]
+) -> None:
+    await users_crud.delete_user(session, user_data)
