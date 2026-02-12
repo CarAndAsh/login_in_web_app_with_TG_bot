@@ -38,6 +38,7 @@ class DBConfig(BaseModel):
     def url(self) -> str:
         return f'sqlite+aiosqlite:///{self.name}'
 
+
 class ApiPrefix(BaseModel):
     api: str = '/api'
     users: str = '/users'
@@ -47,9 +48,15 @@ class ApiPrefix(BaseModel):
     def bearer_token_url(self) -> str:
         return ''.join((self.api,self.auth,'/login')).removeprefix('/')
 
+
 class RunConfig(BaseModel):
     host: str
     port: int
+
+
+class JWTStrategySettings(BaseModel):
+    secret: str
+    lifetime_sec: int = 3600
 
 
 class Settings(BaseSettings):
@@ -64,5 +71,6 @@ class Settings(BaseSettings):
     log: LogSettings = LogSettings()
     templates: Jinja2Templates = Jinja2Templates(APP_DIR / 'app' / 'templates')
     api: ApiPrefix = ApiPrefix()
+    jwt_strategy: JWTStrategySettings
 
 settings = Settings()
