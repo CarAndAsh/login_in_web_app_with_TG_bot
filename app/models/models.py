@@ -1,10 +1,8 @@
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, String, Boolean, Integer
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
-from fastapi_users.db import SQLAlchemyBaseUserTable
 
 from app.core.app_config import settings
 from app.models.mixins.id_int_pk import IdIntPkMixin
-
 
 class Base(DeclarativeBase):
     __abstract__ = True
@@ -18,10 +16,14 @@ class Base(DeclarativeBase):
         return {k:v for k, v in self.__dict__.items() if not k.startswith('_')}
 
 
-class User(IdIntPkMixin, Base, SQLAlchemyBaseUserTable[int]):
-    telegram_id: Mapped[int]
-    is_bot: Mapped[bool]
-    first_name: Mapped[str] = mapped_column(nullable=True)
-    last_name: Mapped[str] = mapped_column(nullable=True)
-    username: Mapped[str] = mapped_column(unique=True)
-    language_code: Mapped[str] = mapped_column()
+class User(IdIntPkMixin, Base):
+    telegram_id: Mapped[int] = mapped_column(Integer, nullable=False, unique=True)
+    is_bot: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    first_name: Mapped[str] = mapped_column(String(length=50), nullable=True)
+    last_name: Mapped[str] = mapped_column(String(length=100), nullable=True)
+    username: Mapped[str] = mapped_column(String(length=50), unique=True)
+    language_code: Mapped[str]
+    hashed_password: Mapped[str] = mapped_column(String(length=1024), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, server_default='True', nullable=False)
+    is_superuser: Mapped[bool] = mapped_column(Boolean, server_default='False', nullable=False)
+    is_verified: Mapped[bool] = mapped_column(Boolean, server_default='False', nullable=False)
