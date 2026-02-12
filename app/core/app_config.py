@@ -38,6 +38,15 @@ class DBConfig(BaseModel):
     def url(self) -> str:
         return f'sqlite+aiosqlite:///{self.name}'
 
+class ApiPrefix(BaseModel):
+    api: str = '/api'
+    users: str = '/users'
+    auth: str = '/auth'
+
+    @property
+    def bearer_token_url(self) -> str:
+        return ''.join((self.api,self.auth,'/login')).removeprefix('/')
+
 class RunConfig(BaseModel):
     host: str
     port: int
@@ -54,6 +63,6 @@ class Settings(BaseSettings):
     db: DBConfig
     log: LogSettings = LogSettings()
     templates: Jinja2Templates = Jinja2Templates(APP_DIR / 'app' / 'templates')
-
+    api: ApiPrefix = ApiPrefix()
 
 settings = Settings()
