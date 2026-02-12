@@ -37,5 +37,4 @@ async def update_user(
 
 async def delete_user(session: AsyncSession, user_by_tg_id: User) -> None:
     await session.delete(user_by_tg_id)
-    print('deleting user')
     await session.commit()
