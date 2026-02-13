@@ -2,7 +2,7 @@ from pydantic import ConfigDict, BaseModel
 
 
 class BaseUserSchema(BaseModel):
-    telegram_id: int
+    telegram_id: int | None
     is_bot: bool
     first_name: str | None
     last_name: str | None

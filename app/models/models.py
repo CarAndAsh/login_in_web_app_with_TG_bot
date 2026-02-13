@@ -17,13 +17,13 @@ class Base(DeclarativeBase):
 
 
 class User(IdIntPkMixin, Base):
-    telegram_id: Mapped[int] = mapped_column(Integer, nullable=False, unique=True)
+    telegram_id: Mapped[int] = mapped_column(Integer, nullable=True, unique=True)
     is_bot: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     first_name: Mapped[str] = mapped_column(String(length=50), nullable=True)
     last_name: Mapped[str] = mapped_column(String(length=100), nullable=True)
     username: Mapped[str] = mapped_column(String(length=50), unique=True)
     language_code: Mapped[str]
-    hashed_password: Mapped[str] = mapped_column(String(length=1024), nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, server_default='True', nullable=False)
-    is_superuser: Mapped[bool] = mapped_column(Boolean, server_default='False', nullable=False)
-    is_verified: Mapped[bool] = mapped_column(Boolean, server_default='False', nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String(length=1024),nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=1, nullable=False)
+    is_superuser: Mapped[bool] = mapped_column(Boolean, default=0, nullable=False)
+    is_verified: Mapped[bool] = mapped_column(Boolean, default=0, nullable=False)
