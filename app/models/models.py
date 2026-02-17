@@ -1,5 +1,6 @@
 from sqlalchemy import MetaData, String, Boolean, Integer
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
+from fastapi_users.db import SQLAlchemyBaseUserTable
 
 from app.core.app_config import settings
 from app.models.mixins.id_int_pk import IdIntPkMixin
@@ -15,15 +16,12 @@ class Base(DeclarativeBase):
     def to_dict(self):
         return {k:v for k, v in self.__dict__.items() if not k.startswith('_')}
 
-
-class User(IdIntPkMixin, Base):
+# columns can't be changed while use sqlite3 - ALTER COLUNM not supported
+class User(IdIntPkMixin, Base, SQLAlchemyBaseUserTable[int]):
     telegram_id: Mapped[int] = mapped_column(Integer, nullable=True, unique=True)
     is_bot: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     first_name: Mapped[str] = mapped_column(String(length=50), nullable=True)
     last_name: Mapped[str] = mapped_column(String(length=100), nullable=True)
     username: Mapped[str] = mapped_column(String(length=50), unique=True)
+    hashed_password: Mapped[str] = mapped_column(String(length=1024), nullable=True)
     language_code: Mapped[str]
-    hashed_password: Mapped[str] = mapped_column(String(length=1024),nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=1, nullable=False)
-    is_superuser: Mapped[bool] = mapped_column(Boolean, default=0, nullable=False)
-    is_verified: Mapped[bool] = mapped_column(Boolean, default=0, nullable=False)
