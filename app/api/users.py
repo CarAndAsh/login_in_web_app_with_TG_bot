@@ -1,35 +1,18 @@
-import json
 from logging import getLogger
 from typing import Annotated, Sequence
 
-from fastapi import Request, APIRouter, Depends, Response
+from aiohttp import request
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import db_helper
-from app.schemas.user import UserSchema, PartialUpdateUserSchema, CreateUserSchema
-from app.crud import users_crud, get_user_by_tg_id
+from app.schemas.user import UserSchema
+from app.crud import users_crud
 
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
 log =  getLogger(__name__)
-
-
-@router.post('/', name='user_page')
-async def add_user_data_by_tg_bot(
-        req: Request, session: Annotated[AsyncSession, Depends(db_helper.session_getter)]
-)-> Response:
-    user_data = await req.json()
-    user_data = json.loads(user_data)
-    user_tg_id = user_data.pop('id')
-    user_data['telegram_id'] = user_tg_id
-    user_for_response = await get_user_by_tg_id(session, user_tg_id)
-    response = Response()
-    if not user_for_response:
-        await users_crud.create_user(session, user_data)
-    else:
-        response.headers['user_tg_id'] = str(user_for_response.telegram_id)
-    return response
 
 
 @router.get('/', name='users')
@@ -39,3 +22,17 @@ async def get_all_users(
     log.info('you get all users list')
     users_list = await users_crud.get_all_users(session)
     return list(map(lambda user: UserSchema.model_validate(user), users_list))
+
+
+@router.post('/register')
+async def add_fastapi_users_attrs(req: Request):
+    tg_user_data = await req.json()
+    tg_user_data['id'] = 10
+    tg_user_data['password'] = 'pass'
+    tg_user_data['email'] = f'{tg_user_data["telegram_id"]}@telegram.tg'
+    tg_user_data['is_active'] = True
+    tg_user_data['is_superuser'] = False
+    tg_user_data['is_verified'] = False
+    async with request('POST', 'http://127.0.0.1:8000/register', json=tg_user_data) as req:
+        res = await req.read()
+    return res
