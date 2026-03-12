@@ -36,5 +36,7 @@ class Settings(BaseSettings):
     log: LogSettings = LogSettings()
     outer_url: str
     user_page: str
+    login: str
+    register: str
 
 settings = Settings()
