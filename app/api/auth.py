@@ -2,12 +2,13 @@ from fastapi import APIRouter
 from fastapi_users import FastAPIUsers
 
 from app.api.dependencies.authentication import auth_backend, get_user_manager
+from app.core.app_config import settings
 from app.models import User
 from app.schemas.user import UserSchema, PartialUpdateUserSchema, CreateUserSchema
 
 fastapi_users = FastAPIUsers[User, int](get_user_manager,[auth_backend])
 
-fastapi_users_router = APIRouter(tags=['FastAPI-Users'])
+fastapi_users_router = APIRouter(prefix=settings.api.auth ,tags=['FastAPI-Users'])
 
 # /login, /logout
 fastapi_users_router.include_router(fastapi_users.get_auth_router(auth_backend))
