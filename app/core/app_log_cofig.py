@@ -31,6 +31,10 @@ log_config_dict = {
     },
     'loggers':
         {
+            'app.core.authentication.user_manager': {
+                'level': settings.log.log_level_value,
+                'handlers': ['stdout_stream', 'to_file'],
+            },
             'app.api.users': {
                 'level': settings.log.log_level_value,
                 'handlers': ['stdout_stream', 'to_file'],
