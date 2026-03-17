@@ -25,9 +25,11 @@ async def get_user_data(msg: Message) -> None:
     user_info = msg.from_user.model_dump(
         include={'id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code'}
     )
-    user_id = msg.from_user.id
-    async with request('POST', settings.outer_url, json=user_info) as req:
-        if req.headers.get('user_tg_id'):
+    async with request('POST', settings.register, json=user_info) as resp:
+        user_data, status = await resp.json()
+        if status == 201:
+            await msg.answer('Данные для регистрации переданы. Добро пожаловать!', reply_markup=ReplyKeyboardRemove())
+        elif status == 400 and user_data.get('detail') == 'REGISTER_USER_ALREADY_EXISTS':
             await msg.answer('Пользователь уже зарегистрирован в системе')
         else:
             await msg.answer('Данные для регистрации переданы. Добро пожаловать!', reply_markup=ReplyKeyboardRemove())
