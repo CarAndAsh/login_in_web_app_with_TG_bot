@@ -1,3 +1,4 @@
+import json
 from logging import getLogger
 import webbrowser
 
@@ -21,7 +22,7 @@ async def startup(msg: Message) -> None:
 
 @other_router.message(F.text == BOT_BTN['get_info'])
 async def get_user_data(msg: Message) -> None:
-    user_info = msg.from_user.model_dump_json(
+    user_info = msg.from_user.model_dump(
         include={'id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code'}
     )
     user_id = msg.from_user.id
