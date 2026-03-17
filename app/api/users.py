@@ -34,6 +34,7 @@ async def add_fastapi_users_attrs(req: Request):
     tg_user_data['is_active'] = True
     tg_user_data['is_superuser'] = False
     tg_user_data['is_verified'] = False
-    async with request('POST', 'http://127.0.0.1:8000/register', json=tg_user_data) as req:
-        res = await req.read()
-    return res
+    async with request('POST', 'http://127.0.0.1:8000/api/auth/register', json=tg_user_data) as resp:
+        response_data = await resp.json()
+        status = resp.status
+    return response_data, status
