@@ -27,6 +27,7 @@ async def get_all_users(
 @router.post('/register')
 async def add_fastapi_users_attrs(req: Request):
     tg_user_data = await req.json()
+    tg_user_data['telegram_id'] = tg_user_data.pop('id')
     tg_user_data['id'] = 10
     tg_user_data['password'] = 'pass'
     tg_user_data['email'] = f'{tg_user_data["telegram_id"]}@telegram.tg'
