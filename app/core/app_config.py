@@ -73,4 +73,7 @@ class Settings(BaseSettings):
     api: ApiPrefix = ApiPrefix()
     jwt_strategy: JWTStrategySettings
 
+    @property
+    def get_static_dir(self) -> Path: return APP_DIR / 'app' / 'static'
+
 settings = Settings()

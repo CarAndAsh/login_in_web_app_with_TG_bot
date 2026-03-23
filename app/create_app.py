@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from logging import getLogger, config as logger_config
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from uvicorn import Server, Config
 
 from app.api import api_router
@@ -24,7 +25,7 @@ async def start_web_app():
     app = FastAPI(lifespan=lifespan)
     app.include_router(views_router)
     app.include_router(api_router)
-
+    app.mount('/static', app=StaticFiles(directory=settings.get_static_dir), name='static')
     server_config = Config(
         app,
         host=settings.run.host,
