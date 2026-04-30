@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width height=device-height, initial-scale=1" charset="UTF-8">
     <title>
         {% block title %}
         Title
@@ -9,9 +9,19 @@
     </title>
 </head>
 <link rel="stylesheet" href="{{ url_for('static', path='/css/bootstrap.min.css') }}">
-<body>
-{% block body %}
-Body
-{% endblock body %}
+<body data-bs-theme="dark" class="min-vh-100 d-flex flex-column">
+    {% block header %}
+    {% include 'components/header.html' %}
+    {% endblock header %}
+
+    <div class="d-flex flex-column flex-fill align-items-center justify-content-center">
+        {% block body %}
+        Body
+        {% endblock body %}
+    </div>
+
+    {% block footer %}
+    {% include 'components/footer.html' %}
+    {% endblock footer %}
 </body>
 </html>
