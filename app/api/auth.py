@@ -18,9 +18,8 @@ fastapi_users_router.include_router(fastapi_users.get_register_router(UserSchema
 fastapi_users_router.include_router(fastapi_users.get_verify_router(UserSchema))
 # /forgot-password, /reset-password
 fastapi_users_router.include_router(fastapi_users.get_reset_password_router())
-# PATCH /me, /id
+# GET and PATCH me and GET, PATCH and DELETE user by id
 fastapi_users_router.include_router(fastapi_users.get_users_router(UserSchema, PartialUpdateUserSchema))
-# PATCH and DELETE users use user.get(id)
 
 current_user = fastapi_users.current_user()
 current_active_user = fastapi_users.current_user(active=True)
