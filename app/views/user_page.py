@@ -8,6 +8,19 @@ from app.core.app_config import settings
 from app.crud.dependencies import get_user_by_tg_id
 from app.models import db_helper
 
+def user_context(
+        user: dict):
+        context = {'labels': {
+            'telegram_id': 'телеграм ID',
+            'first_name': 'Имя',
+            'last_name': 'Фамилия',
+            'username': 'Никнейм',
+            'email': 'Электронная почта'
+        },
+            'user': user}
+        return context
+
+
 router = APIRouter(include_in_schema=False, tags=['For_templates',])
 
 @router.get('/user_page/{tg_id:int}', name='user_page')
