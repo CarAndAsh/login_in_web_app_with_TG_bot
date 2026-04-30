@@ -17,3 +17,8 @@ class LoginForm(StarletteForm):
     email = EmailField('E-mail')
     password = PasswordField('Пароль')
     submit = SubmitField('Войти')
+
+
+class LoginDataForm(BaseModel):
+    email: str
+    password: str
