@@ -1,11 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Request
-from fastapi.params import Depends
+from fastapi import APIRouter, Request, Form, Depends
+from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi_users import BaseUserManager
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.dependencies.authentication import get_user_manager
 from app.core.app_config import settings
-from app.crud.dependencies import get_user_by_tg_id
+from app.crud.dependencies import get_user_by_tg_id, get_users_db
 from app.models import db_helper
 from app.schemas.forms import LoginDataForm, RegisterDataForm
 
@@ -22,6 +25,11 @@ def user_context(
         },
             'user': user}
         return context
+
+
+@router.post('/redirect_to_user_page', name='redirect_to_user_page')
+def redirect_to_user_page(req: Request, user_data: Annotated[LoginDataForm, Form()]):
+    return RedirectResponse(req.url_for('user_page', email=user_data.email))
 
 
 @router.post('/{email:str}', name='user_page')
