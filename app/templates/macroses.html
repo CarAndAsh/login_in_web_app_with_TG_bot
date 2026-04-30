@@ -1,0 +1,12 @@
+{% macro form_gen(form) %}
+    {% for field in form %}
+    <div class="d-flex my-2 justify-content-between w-100">
+        {% if field.name != 'submit' %}
+        <div class="px-2">{{ field.label }}: </div><div>{{ field }}</div>
+        {% else %}
+        <div class="d-flex w-100 justify-content-center">{{ field }}</div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+{% endmacro %}
