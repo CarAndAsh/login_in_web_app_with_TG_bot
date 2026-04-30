@@ -7,6 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.app_config import settings
 from app.crud.dependencies import get_user_by_tg_id
 from app.models import db_helper
+from app.schemas.forms import LoginDataForm, RegisterDataForm
+
+router = APIRouter(include_in_schema=True, tags=['User_page',])
 
 def user_context(
         user: dict):
@@ -19,6 +22,21 @@ def user_context(
         },
             'user': user}
         return context
+
+
+@router.post('/{email:str}', name='user_page')
+async def get_user_data(
+        req: Request,
+        user_data: Annotated[LoginDataForm, Form()],
+        user_manager: Annotated[BaseUserManager, Depends(get_user_manager)]
+):
+    user = await user_manager.authenticate(
+        OAuth2PasswordRequestForm(
+            username=user_data.email,
+            password=user_data.password
+        )
+    )
+    return settings.templates.TemplateResponse(req, 'user_page.html', user_context(user.to_dict()))
 
 
 router = APIRouter(include_in_schema=False, tags=['For_templates',])
