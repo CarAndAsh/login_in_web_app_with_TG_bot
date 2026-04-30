@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% from 'macroses.html' import form_gen %}
+{% block title %}
+Вход пользователя
+{% endblock title %}
+{% block body %}
+<p>
+    Здесь должна быть форма входа
+</p>
+<form class="d-flex flex-column" method="POST" action="{{ url_for('redirect_to_user_page') }}">
+    {{ form_gen(form) }}
+</form>
+{% endblock body %}
