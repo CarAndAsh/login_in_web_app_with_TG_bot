@@ -1,9 +1,11 @@
 {% extends 'base.html' %}
 {% block title %}
-User page
+{{ user['first_name'] }} {{ user['last_name'] }}
 {% endblock title %}
 {% block body %}
-    {% for val in [telegram_id, username, first_name, last_name, is_bot] %}
-        {{ val }}
-    {% endfor %}
+{% for key in labels %}
+<p>
+    {{ labels[key] }} <code>{{ user[key] }}</code>
+</p>
+{% endfor %}
 {% endblock body %}
