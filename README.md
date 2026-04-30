@@ -12,3 +12,4 @@
 - https://aiosqlite.omnilib.dev/en/stable/
 - https://fastapi-users.github.io/fastapi-users/latest/configuration/overview/
 - https://getbootstrap.com/
+- https://github.com/amorey/starlette-wtf
