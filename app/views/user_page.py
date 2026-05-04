@@ -1,4 +1,5 @@
-from typing import Annotated
+from functools import singledispatch
+from typing import Annotated, Union
 
 from fastapi import APIRouter, Request, Form, Depends
 from fastapi.responses import RedirectResponse
@@ -11,8 +12,11 @@ from app.core.app_config import settings
 from app.crud.dependencies import get_user_by_tg_id, get_users_db
 from app.models import db_helper
 from app.schemas.forms import LoginDataForm, RegisterDataForm
+from app.schemas.user import CreateUserSchema
 
 router = APIRouter(include_in_schema=True, tags=['User_page',])
+
+UserFormType: Union = LoginDataForm | RegisterDataForm
 
 def user_context(
         user: dict):
@@ -28,22 +32,30 @@ def user_context(
 
 
 @router.post('/redirect_to_user_page', name='redirect_to_user_page')
-def redirect_to_user_page(req: Request, user_data: Annotated[LoginDataForm, Form()]):
+def redirect_to_user_page(req: Request, user_data: Annotated[UserFormType, Form()]):
     return RedirectResponse(req.url_for('user_page', email=user_data.email))
+
+
+@singledispatch
+async def get_user(user_data: LoginDataForm, user_manager: BaseUserManager):
+    return await user_manager.authenticate(
+        OAuth2PasswordRequestForm(username=user_data.email, password=user_data.password))
+
+
+@get_user.register
+async def _(user_data: RegisterDataForm, user_manager: BaseUserManager):
+    user = CreateUserSchema(**user_data.model_dump(exclude_none=True))
+    user = await user_manager.create(user, safe=True)
+    return user
 
 
 @router.post('/{email:str}', name='user_page')
 async def get_user_data(
         req: Request,
-        user_data: Annotated[LoginDataForm, Form()],
+        user_data: Annotated[UserFormType, Form()],
         user_manager: Annotated[BaseUserManager, Depends(get_user_manager)]
 ):
-    user = await user_manager.authenticate(
-        OAuth2PasswordRequestForm(
-            username=user_data.email,
-            password=user_data.password
-        )
-    )
+    user = await get_user(user_data, user_manager)
     return settings.templates.TemplateResponse(req, 'user_page.html', user_context(user.to_dict()))
 
 
