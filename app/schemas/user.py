@@ -10,7 +10,7 @@ class TelegramUserSchema(BaseModel):
     first_name: str | None
     last_name: str | None
     username: str
-    language_code: str
+    language_code: str | None
 
 
 class UserSchema(BaseUser[int], TelegramUserSchema):
@@ -24,4 +24,7 @@ class PartialUpdateUserSchema(UserSchema, BaseUserUpdate, TelegramUserSchema):
 
 
 class CreateUserSchema(UserSchema, BaseUserCreate, TelegramUserSchema):
+    id : None = None
     email: EmailStr | None = None
+    telegram_id: int | None = None
+    language_code: str | None = None
