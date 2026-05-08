@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
+{% from 'macroses.html' import form_gen %}
 {% block title %}
-{{ user['first_name'] }} {{ user['last_name'] }}
+{{ user.first_name }} {{ user.last_name }}
 {% endblock title %}
 {% block body %}
-{% for key in labels %}
-<p>
-    {{ labels[key] }} <code>{{ user[key] }}</code>
-</p>
-{% endfor %}
+<form class="d-flex flex-column" method="POST" action="#">
+    {{ form_gen(user_form) }}
+</form>
 {% endblock body %}
