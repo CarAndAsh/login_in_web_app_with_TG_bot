@@ -56,7 +56,15 @@ class RunConfig(BaseModel):
 
 class JWTStrategySettings(BaseModel):
     secret: str
-    lifetime_sec: int = 3600
+    lifetime_sec: int = 60
+
+
+class CookieSettings(BaseModel):
+    name: str = 'user-auth'
+    max_age: int = 60
+    secure: bool = False
+    httponly: bool = True
+    samesite: Literal['lax', "strict", "none"] = 'lax'
 
 
 class Settings(BaseSettings):
@@ -72,6 +80,7 @@ class Settings(BaseSettings):
     templates: Jinja2Templates = Jinja2Templates(APP_DIR / 'app' / 'templates')
     api: ApiPrefix = ApiPrefix()
     jwt_strategy: JWTStrategySettings
+    cookie: CookieSettings
 
     @property
     def get_static_dir(self) -> Path: return APP_DIR / 'app' / 'static'
