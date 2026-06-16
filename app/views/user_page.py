@@ -75,7 +75,11 @@ async def get_user_data(req: Request, user: Annotated[User, Depends(current_user
     return settings.templates.TemplateResponse(req, 'user_page.html', {'user_form':form, 'user': user})
 
 
-router = APIRouter(include_in_schema=False, tags=['For_templates',])
+@router.delete('/delete_cookie')
+async def delete_cookie(req: Request):
+    response = RedirectResponse(req.url_for('main'))
+    response.delete_cookie(settings.cookie.name)
+    return response
 
 @router.get('/user_page/{tg_id:int}', name='user_page')
 async def user_page_by_tg_id(
