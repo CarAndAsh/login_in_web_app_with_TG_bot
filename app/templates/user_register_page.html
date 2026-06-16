@@ -8,7 +8,7 @@
 <p>
     Здесь должна быть форма регистрации
 </p>
-<form class="d-flex flex-column" method="POST" action="{{ url_for('redirect_to_user_page') }}">
+<form class="d-flex flex-column" method="POST" action="{{ url_for('auth_redirect') }}">
     {{ form_gen(form) }}
 </form>
 {% endblock body %}
