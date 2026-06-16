@@ -8,13 +8,14 @@ from fastapi_users import BaseUserManager
 from fastapi_users.authentication import JWTStrategy
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies.authentication import get_user_manager
 from app.api.dependencies.authentication import get_user_manager, get_jwt_strategy
+from app.api.auth import current_user
 from app.core.app_config import settings
 from app.crud.dependencies import get_user_by_tg_id
-from app.models import db_helper
+from app.models import db_helper, User
 from app.schemas.forms import LoginDataForm, RegisterDataForm, UserForm
-from app.schemas.user import CreateUserSchema
+from app.schemas.user import CreateUserSchema, PartialUpdateUserSchema
+
 
 router = APIRouter(include_in_schema=True, tags=['User_page',])
 
@@ -50,6 +51,23 @@ async def auth_and_redirect_to_user_page(
 ):
     user = await get_user(user_data, user_manager)
     return await response_with_auth_cookie(req, strategy, user, user_data.email)
+
+
+@router.post('/update_and_redirect_to_user_page', name='update_redirect')
+async def update_and_redirect_to_user_page(
+        req: Request,
+        user_data: Annotated[PartialUpdateUserSchema, Form()],
+        user_manager: Annotated[BaseUserManager, Depends(get_user_manager)],
+        user: Annotated[User, Depends(current_user)],
+        strategy: Annotated[JWTStrategy, Depends(get_jwt_strategy)]
+):
+    user = await user_manager.update(user_update=user_data, user=user)
+    return await response_with_auth_cookie(req, strategy, user, user_data.email)
+
+
+# must be last in route's list because of gen path
+@router.post('/{email:str}', name='user_page')
+async def get_user_data(req: Request, user: Annotated[User, Depends(current_user)]):
     form = UserForm(req)
     for field in form:
         if field.name not in ('password', 'confirm_password', 'submit'):
