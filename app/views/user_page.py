@@ -29,8 +29,10 @@ async def get_user(user_data: LoginDataForm, user_manager: BaseUserManager):
 @get_user.register
 async def _(user_data: RegisterDataForm, user_manager: BaseUserManager):
     user = CreateUserSchema(**user_data.model_dump(exclude_none=True))
-    user = await user_manager.create(user, safe=True)
-    return user
+    await user_manager.create(user, safe=True)
+    return await user_manager.authenticate(
+        OAuth2PasswordRequestForm(username=user_data.email, password=user_data.password))
+
 
 async def response_with_auth_cookie(req, strategy, user, user_email) -> RedirectResponse:
     response = RedirectResponse(req.url_for('user_page', email=user_email))
