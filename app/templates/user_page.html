@@ -4,7 +4,7 @@
 {{ user.first_name }} {{ user.last_name }}
 {% endblock title %}
 {% block body %}
-<form class="d-flex flex-column" method="POST" action="#">
+<form class="d-flex flex-column" method="POST" action="{{ url_for('update_redirect') }}">
     {{ form_gen(user_form) }}
 </form>
 {% endblock body %}
