@@ -11,7 +11,7 @@ from app.core.app_config import settings
 from app.core.app_log_cofig import log_config_dict
 from app.models import db_helper
 from app.views import views_router
-
+from app.views.error_handler import register_errors_handlers
 
 
 async def start_web_app():
@@ -40,5 +40,6 @@ async def start_web_app():
         reload=True
     )
     app_server = Server(server_config)
+    register_errors_handlers(app)
 
     await app_server.serve()
