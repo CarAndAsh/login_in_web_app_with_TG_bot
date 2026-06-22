@@ -1,6 +1,7 @@
 from logging import getLogger, config as logger_config
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.session.aiohttp import AiohttpSession
 
 from bot.bot_core.bot_log_cofig import log_config_dict
 from bot.bot_core.config import settings
@@ -27,7 +28,11 @@ async def name_and_desc_check_and_set(bot: Bot) -> None:
 
 
 async def start_bot() -> None:
-    bot = Bot(settings.reg_bot.token, short_descripton='Базовый бот')
+    session = AiohttpSession(proxy='http://185.65.202.227:3128')
+    bot = Bot(
+        settings.reg_bot.token,
+        session=session,
+        short_descripton='Базовый бот')
     # await name_and_desc_check_and_set(bot)
     await bot.set_my_commands(command_list)
     dp = Dispatcher()
