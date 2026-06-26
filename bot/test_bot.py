@@ -28,7 +28,7 @@ async def name_and_desc_check_and_set(bot: Bot) -> None:
 
 
 async def start_bot() -> None:
-    session = AiohttpSession(proxy='http://185.65.202.227:3128')
+    session = AiohttpSession(proxy=settings.proxy)
     bot = Bot(
         settings.reg_bot.token,
         session=session,

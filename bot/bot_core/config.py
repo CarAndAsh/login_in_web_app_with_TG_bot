@@ -24,7 +24,6 @@ class TGBotSettings(BaseModel):
     token: str
 
 
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / '.env',
@@ -34,9 +33,7 @@ class Settings(BaseSettings):
     )
     reg_bot: TGBotSettings
     log: LogSettings = LogSettings()
-    outer_url: str
-    user_page: str
-    login: str
     register: str
+    proxy: str
 
 settings = Settings()
