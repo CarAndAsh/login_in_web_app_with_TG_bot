@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     )
     reg_bot: TGBotSettings
     log: LogSettings = LogSettings()
-    register: str
     proxy: str
+    user_register: str
 
 settings = Settings()
