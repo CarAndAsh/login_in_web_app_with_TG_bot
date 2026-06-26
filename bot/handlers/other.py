@@ -1,7 +1,7 @@
-import json
 from logging import getLogger
 import webbrowser
 
+import aiohttp.web_exceptions
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ReplyKeyboardRemove
@@ -22,18 +22,24 @@ async def startup(msg: Message) -> None:
 
 @other_router.message(F.text == BOT_BTN['get_info'])
 async def get_user_data(msg: Message) -> None:
-    user_info = msg.from_user.model_dump(
+    user_data = msg.from_user.model_dump(
         include={'id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code'}
     )
-    async with request('POST', settings.register, json=user_info) as resp:
-        user_data, status = await resp.json()
-        if status == 201:
-            await msg.answer('Данные для регистрации переданы. Добро пожаловать!', reply_markup=ReplyKeyboardRemove())
-        elif status == 400 and user_data.get('detail') == 'REGISTER_USER_ALREADY_EXISTS':
-            await msg.answer('Пользователь уже зарегистрирован в системе')
-        else:
-            await msg.answer('Данные для регистрации переданы. Добро пожаловать!', reply_markup=ReplyKeyboardRemove())
-            webbrowser.open(f'{settings.user_page}/{user_id}')
+    user_data['telegram_id'] = user_data.pop('id')
+    # TODO ask user about e-mail
+    user_data['email'] = f'{user_data["telegram_id"]}@tg.org'
+    # TODO change password on generated
+    user_data['password'] = 'pass'
+    async with request('POST', settings.user_register, json=user_data) as resp:
+        try:
+            resp.raise_for_status()
+        except aiohttp.web_exceptions.HTTPException:
+            await msg.answer('Ошибка связи')
+    if resp.status == 200:
+        await msg.answer(f'Данные для регистрации переданы. Добро пожаловать! Ваш временный пароль - {user_data["password"]}', reply_markup=ReplyKeyboardRemove())
+    elif resp.status == 400:
+        await msg.answer('Пользователь уже зарегистрирован в системе')
+    # webbrowser.open(f'{user_data.url}')
 
 
 @other_router.message(Command('info'))
