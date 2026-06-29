@@ -41,7 +41,7 @@ async def _(user_data: CreateUserSchema, user_manager: BaseUserManager):
 
 
 async def response_with_auth_cookie(req, strategy, user, user_email) -> RedirectResponse:
-    response = RedirectResponse(req.url_for('user_page', email_or_tg_id=user_email))
+    response = RedirectResponse(req.url_for('user_page', email=user_email))
     token = await strategy.write_token(user)
     response.set_cookie(key=settings.cookie.name, value=token)
     return response
