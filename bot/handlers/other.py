@@ -1,7 +1,7 @@
 from logging import getLogger
 import webbrowser
 
-import aiohttp.web_exceptions
+from aiohttp import web_exceptions, client_exceptions
 from aiogram import Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import Message, ReplyKeyboardRemove
@@ -33,8 +33,10 @@ async def get_user_data(msg: Message) -> None:
     async with request('POST', settings.user_register, json=user_data) as resp:
         try:
             resp.raise_for_status()
-        except aiohttp.web_exceptions.HTTPException:
+        except web_exceptions.HTTPException:
             await msg.answer('Ошибка связи')
+        except client_exceptions.ClientResponseError:
+            await msg.answer('Вы уже зарегистрированы в системе')
     if resp.status == 200:
         await msg.answer(f'Данные для регистрации переданы. Добро пожаловать! Ваш временный пароль - {user_data["password"]}', reply_markup=ReplyKeyboardRemove())
     elif resp.status == 400:
