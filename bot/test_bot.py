@@ -5,7 +5,7 @@ from aiogram.client.session.aiohttp import AiohttpSession
 
 from bot.bot_core.bot_log_cofig import log_config_dict
 from bot.bot_core.config import settings
-from bot.handlers.other import other_router
+from bot.handlers import router
 from bot.keyboards.menu import command_list
 from bot.lexicon.lexicon_ru import BOT_INFO
 
@@ -36,7 +36,7 @@ async def start_bot() -> None:
     # await name_and_desc_check_and_set(bot)
     await bot.set_my_commands(command_list)
     dp = Dispatcher()
-    dp.include_router(other_router)
+    dp.include_router(router)
     await bot.delete_webhook(drop_pending_updates=False)
     log.info('Бот запущен')
     await dp.start_polling(bot)
