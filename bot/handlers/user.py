@@ -1,0 +1,34 @@
+from logging import getLogger
+
+from aiogram import F, Router
+from aiogram.types import Message, ReplyKeyboardRemove
+from aiohttp import request, web_exceptions, client_exceptions
+
+from bot.bot_core.config import settings
+from bot.lexicon.lexicon_ru import BOT_BTN
+
+
+user_router: Router = Router()
+
+log = getLogger(__name__)
+
+@user_router.message(F.text == BOT_BTN['get_info'])
+async def get_user_data(msg: Message) -> None:
+    user_data = msg.from_user.model_dump(
+        include={'id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code'}
+    )
+    user_data['telegram_id'] = user_data.pop('id')
+    # TODO ask user about e-mail
+    user_data['email'] = f'{user_data["telegram_id"]}@tg.org'
+    # TODO change password on generated
+    user_data['password'] = 'pass'
+    async with request('POST', settings.user_register, json=user_data) as resp:
+        try:
+            resp.raise_for_status()
+        except web_exceptions.HTTPException:
+            await msg.answer('Ошибка связи')
+        except client_exceptions.ClientResponseError:
+            await msg.answer('Вы уже зарегистрированы в системе')
+    if resp.status == 200:
+        await msg.answer(f'Данные для регистрации переданы. Добро пожаловать! Ваш временный пароль - {user_data["password"]}', reply_markup=ReplyKeyboardRemove())
+    # webbrowser.open(f'{user_data.url}')
