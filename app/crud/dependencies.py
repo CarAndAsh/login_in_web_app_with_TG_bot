@@ -9,12 +9,11 @@ from app.models import User, db_helper
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
-async def get_user_by_tg_id(
+async def get_user_email_by_tg_id(
         session: Annotated['AsyncSession', Depends(db_helper.session_getter)],
-        user_tg_id: int) -> User | None:
-    query = await session.execute(select(User).filter(User.telegram_id == user_tg_id))
-    user = query.scalar()
-    return user
+        user_tg_id: int) -> str | None:
+    query = await session.execute(select(User.email).filter(User.telegram_id == user_tg_id))
+    return query.scalar_one_or_none()
 
 
 async def get_users_db(
