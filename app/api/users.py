@@ -1,14 +1,15 @@
 from logging import getLogger
 from typing import Annotated, Sequence
 
-from aiohttp import request
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
+from fastapi.params import Body
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import JSONResponse
 
+from app.crud import users_crud
+from app.crud.dependencies import get_user_email_by_tg_id
 from app.models import db_helper
 from app.schemas.user import UserSchema
-from app.crud import users_crud
-
 
 router = APIRouter(prefix='/users', tags=['Users'])
 
@@ -24,17 +25,10 @@ async def get_all_users(
     return list(map(lambda user: UserSchema.model_validate(user), users_list))
 
 
-@router.post('/register')
-async def add_fastapi_users_attrs(req: Request):
-    tg_user_data = await req.json()
-    tg_user_data['telegram_id'] = tg_user_data.pop('id')
-    tg_user_data['id'] = 10
-    tg_user_data['password'] = 'pass'
-    tg_user_data['email'] = f'{tg_user_data["telegram_id"]}@telegram.tg'
-    tg_user_data['is_active'] = True
-    tg_user_data['is_superuser'] = False
-    tg_user_data['is_verified'] = False
-    async with request('POST', 'http://127.0.0.1:8000/api/auth/register', json=tg_user_data) as resp:
-        response_data = await resp.json()
-        status = resp.status
-    return response_data, status
+@router.post('/user_email_by_tg_id')
+async def get_user_email(
+        session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+        telegram_id: Annotated[int, Body()],
+) -> JSONResponse:
+    user_email: str = await get_user_email_by_tg_id(session, telegram_id)
+    return JSONResponse(content=user_email)
