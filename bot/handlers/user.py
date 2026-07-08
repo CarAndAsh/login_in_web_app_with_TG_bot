@@ -1,10 +1,12 @@
 from logging import getLogger
 
 from aiogram import F, Router
+from aiogram.filters import CommandStart
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiohttp import request, web_exceptions, client_exceptions
 
 from bot.bot_core.config import settings
+from bot.keyboards.keyboards import reply_keyboard
 from bot.lexicon.lexicon_ru import BOT_BTN
 
 
@@ -14,6 +16,9 @@ log = getLogger(__name__)
 
 @user_router.message(F.text == BOT_BTN['get_info'])
 async def get_user_data(msg: Message) -> None:
+@user_router.message(CommandStart())
+async def startup(msg: Message, state: FSMContext) -> Message:
+    return await msg.answer('Для входа на сайт нажмите кнопку ниже 👇', reply_markup=reply_keyboard)
     user_data = msg.from_user.model_dump(
         include={'id', 'is_bot', 'first_name', 'last_name', 'username', 'language_code'}
     )
