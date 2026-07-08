@@ -13,12 +13,12 @@ log = getLogger(__name__)
 
 
 @other_router.message(Command('info'))
-async def info(msg: Message) -> None:
-    await msg.answer(BOT_INFO['description']+'\nДля входа на сайт нажмите кнопку ниже 👇', reply_markup=reply_keyboard)
+async def info(msg: Message) -> Message:
+    return await msg.answer(BOT_INFO['description']+'\nДля входа на сайт нажмите кнопку ниже 👇', reply_markup=reply_keyboard)
 
 
 @other_router.message()
-async def echo(msg: Message) -> None:
+async def echo(msg: Message) -> Message:
     if msg.text:
         log.info(f'Поступило сообщение: {msg.text}')
-        await msg.answer(msg.text)
+        return await msg.answer(msg.text)
