@@ -2,6 +2,7 @@ from logging import getLogger
 
 from aiogram import F, Router
 from aiogram.filters import CommandStart
+from aiogram.fsm.state import StatesGroup, State, default_state
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiohttp import request, web_exceptions, client_exceptions
 
@@ -17,6 +18,14 @@ log = getLogger(__name__)
 @user_router.message(F.text == BOT_BTN['get_info'])
 async def get_user_data(msg: Message) -> None:
 @user_router.message(CommandStart())
+class FSMAuthUser(StatesGroup):
+    check_user = State()
+    email_fill = State()
+    password_fill = State()
+    confirm_pwd_fill = State()
+    login = State()
+    register = State()
+
 async def startup(msg: Message, state: FSMContext) -> Message:
     return await msg.answer('Для входа на сайт нажмите кнопку ниже 👇', reply_markup=reply_keyboard)
     user_data = msg.from_user.model_dump(
