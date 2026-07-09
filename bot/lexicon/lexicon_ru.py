@@ -10,4 +10,5 @@ BOT_BTN = {
 BOT_MENU = {
     'start': 'Запуск бота',
     'info': 'Информация о боте',
+    'reset_fsm': 'Сброс FSM'
 }
