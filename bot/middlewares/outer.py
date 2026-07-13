@@ -20,10 +20,11 @@ class DeleteUserMessageMiddleware(BaseMiddleware):
             data: dict[str, Any],
 ) -> Message:
 
-        user_id: int = event.from_user.id
-        await self.__delete_prev_chat_message__(event, event.bot.id)
-        self.id_dict[user_id] = event.message_id
         out_msg: Message = await handler(event, data)
-        await self.__delete_prev_chat_message__(event, user_id)
-        self.id_dict[out_msg.from_user.id] = out_msg.message_id
-        return out_msg
+        if isinstance(out_msg, Message):
+            user_id: int = event.from_user.id
+            await self.__delete_prev_chat_message__(event, event.bot.id)
+            self.id_dict[user_id] = event.message_id
+            await self.__delete_prev_chat_message__(event, user_id)
+            self.id_dict[out_msg.from_user.id] = out_msg.message_id
+            return out_msg
