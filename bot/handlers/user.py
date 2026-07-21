@@ -3,10 +3,11 @@ from logging import getLogger
 from aiogram import F, Router
 from aiogram.filters import CommandStart, StateFilter, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import StatesGroup, State, default_state
+from aiogram.fsm.state import default_state
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiohttp import request, web_exceptions, client_exceptions
 
+from bot.bot_core import FSMAuthUser
 from bot.bot_core.config import settings
 from bot.keyboards.keyboards import reply_keyboard
 from bot.lexicon.lexicon_ru import BOT_BTN
@@ -16,13 +17,6 @@ user_router: Router = Router()
 
 log = getLogger(__name__)
 
-class FSMAuthUser(StatesGroup):
-    check_user = State()
-    email_fill = State()
-    password_fill = State()
-    confirm_pwd_fill = State()
-    login = State()
-    register = State()
 
 @user_router.message(Command('reset_fsm'))
 async def reset_fsm(msg: Message, state: FSMContext) -> Message:
