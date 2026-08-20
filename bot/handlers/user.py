@@ -9,8 +9,8 @@ from aiohttp import request, web_exceptions
 
 from bot.bot_core import FSMAuthUser
 from bot.bot_core.config import settings
-from bot.keyboards.keyboards import reply_keyboard
-from bot.lexicon.lexicon_ru import BOT_BTN, STATE_INPUT_PLACEHOLDER
+from bot.keyboards.keyboards import reply_keyboard, link_keyboard
+from bot.lexicon.lexicon_ru import FINAL_BOT_MESSAGE
 
 user_router: Router = Router()
 
@@ -51,6 +51,7 @@ async def get_user_data(cbq: CallbackQuery, state: FSMContext) -> Message:
            return await cbq.message.edit_text('Ошибка связи')
 
     if user_email:
+        await state.set_data({'username':user_email}) # fastapi-users needs e-mail as username
         await state.set_state(FSMAuthUser.password_fill)
         await cbq.message.edit_text(
             f'Ваш e-mail, зарегистрированеный в системе - {user_email}. Введите пароль для входа.',
@@ -62,12 +63,12 @@ async def get_user_data(cbq: CallbackQuery, state: FSMContext) -> Message:
             'Ваш e-mail, не указан в системе, для регистрации укажите его в поле ввода.',
         )
     await state.update_data({'edit_msg_id':cbq.message})
-    return answer
+
 
 
 @user_router.message(FSMAuthUser.email_fill)
 async def get_users_email(msg:Message, state: FSMContext):
-    await state.update_data({'user_email':msg.text})
+    await state.update_data({'email':msg.text})
     await msg.delete()
     editable_msg = await state.get_value('edit_msg_id')
     await editable_msg.edit_text('e-mail принят, теперь введите пароль')
@@ -78,11 +79,8 @@ async def get_users_email(msg:Message, state: FSMContext):
 @user_router.message(FSMAuthUser.password_fill)
 async def get_users_password(msg:Message, state: FSMContext):
     user_data = await state.get_data()
-    user_password = msg.text
-    user_data['password'] = user_password
+    user_data['password'] = msg.text
     await msg.delete()
-    editable_msg = await state.get_value('edit_msg_id')
-    if 'user_email' in user_data:
     editable_msg: Message = user_data.pop('edit_msg_id')
         await state.set_state(FSMAuthUser.login)
         await editable_msg.edit_text(
