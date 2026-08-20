@@ -15,6 +15,7 @@ log = getLogger(__name__)
 
 @other_router.message(Command('info'))
 async def info(msg: Message) -> Message:
+    await msg.delete()
     return await msg.answer(BOT_INFO['description']+'\nДля входа на сайт нажмите кнопку ниже 👇', reply_markup=reply_keyboard)
 
 
