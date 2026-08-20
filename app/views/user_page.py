@@ -54,15 +54,17 @@ async def auth_and_redirect_to_user_page(
         strategy: Annotated[JWTStrategy, Depends(get_jwt_strategy)],
 ):
     user_data: FormData = await req.form()
-    if not user_data:
-        user_data = await req.json()
+    if not (submit := user_data.get('submit')):
         valid_user_data = CreateUserSchema.model_validate(user_data)
-    elif user_data['submit'] == 'Войти':
-        valid_user_data = LoginDataForm.model_validate(dict(user_data))
-    elif user_data['submit'] == 'Зарегистрироваться':
-        valid_user_data = RegisterDataForm.model_validate(dict(user_data))
-    user = await get_user(valid_user_data, user_manager)
-    return await response_with_auth_cookie(req, strategy, user, user.email)
+        user = await get_user(valid_user_data, user_manager)
+        return await strategy.write_token(user)
+    else:
+        if submit == 'Войти':
+            valid_user_data = LoginDataForm.model_validate(user_data)
+        elif submit == 'Зарегистрироваться':
+            valid_user_data = RegisterDataForm.model_validate(user_data)
+        user = await get_user(valid_user_data, user_manager)
+        return await response_with_auth_cookie(req, strategy, user, user.email)
 
 
 @router.post('/update_and_redirect_to_user_page', name='update_redirect')
