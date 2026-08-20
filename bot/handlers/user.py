@@ -31,6 +31,7 @@ async def reset_fsm(msg: Message, state: FSMContext) -> None:
 
 @user_router.message(CommandStart(), StateFilter(default_state))
 async def startup(msg: Message, state: FSMContext) -> Message:
+    await msg.delete()
     await state.set_state(FSMAuthUser.check_user)
     return await msg.answer('Для входа на сайт нажмите кнопку ниже 👇',reply_markup=reply_keyboard)
 
@@ -51,14 +52,13 @@ async def get_user_data(cbq: CallbackQuery, state: FSMContext) -> Message:
 
     if user_email:
         await state.set_state(FSMAuthUser.password_fill)
-        await state.set_data({'user_email':user_email})
-        answer = await cbq.message.edit_text(
+        await cbq.message.edit_text(
             f'Ваш e-mail, зарегистрированеный в системе - {user_email}. Введите пароль для входа.',
         )
     else:
         await state.set_data(user_data)
         await state.set_state(FSMAuthUser.email_fill)
-        answer = await cbq.message.edit_text(
+        await cbq.message.edit_text(
             'Ваш e-mail, не указан в системе, для регистрации укажите его в поле ввода.',
         )
     await state.update_data({'edit_msg_id':cbq.message})
@@ -70,9 +70,9 @@ async def get_users_email(msg:Message, state: FSMContext):
     await state.update_data({'user_email':msg.text})
     await msg.delete()
     editable_msg = await state.get_value('edit_msg_id')
-    await editable_msg.edit_text(
-        'e-mail принят, теперь введите пароль',
-    )
+    await editable_msg.edit_text('e-mail принят, теперь введите пароль')
+    await state.set_state(FSMAuthUser.password_fill)
+
 
 
 @user_router.message(FSMAuthUser.password_fill)
@@ -83,13 +83,10 @@ async def get_users_password(msg:Message, state: FSMContext):
     await msg.delete()
     editable_msg = await state.get_value('edit_msg_id')
     if 'user_email' in user_data:
+    editable_msg: Message = user_data.pop('edit_msg_id')
         await state.set_state(FSMAuthUser.login)
         await editable_msg.edit_text(
         f'С возвращением, {msg.from_user.first_name}! Перейдите в свой профиль по ссылке ниже',
     )
     else:
-        await state.set_state(FSMAuthUser.register)
-        await editable_msg.edit_text(
-        'Благодарим за регистрацию, перейдите в свой профиль по ссылке ниже'
-    )
-    # webbrowser.open(f'{user_data.url}')
+        await editable_msg.edit_text('Неверно указан пароль, повторите')
