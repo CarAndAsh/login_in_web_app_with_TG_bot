@@ -79,8 +79,21 @@ async def update_and_redirect_to_user_page(
     return await response_with_auth_cookie(req, strategy, user, user_data.email)
 
 
+@router.get('/tg_redirect/{response_token:str}/{user_email:str}')
+async def get_user_data(
+        req: Request,
+        response_token: str,
+        user_email: str
+) -> RedirectResponse:
+
+    response = RedirectResponse(req.url_for('user_page', email=user_email))
+    response.set_cookie(key=settings.cookie.name, value=response_token)
+    return response
+
+
 # must be last in route's list because of gen path
 @router.post('/{email:str}', name='user_page')
+@router.get('/{email:str}', name='user_page')
 async def get_user_data(req: Request, user: Annotated[User, Depends(current_user)]):
     form = UserForm(req)
     for field in form:
