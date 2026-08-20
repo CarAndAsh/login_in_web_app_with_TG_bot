@@ -18,9 +18,14 @@ log = getLogger(__name__)
 
 
 @user_router.message(Command('reset_fsm'))
-async def reset_fsm(msg: Message, state: FSMContext) -> Message:
+async def reset_fsm(msg: Message, state: FSMContext) -> None:
+    await msg.delete()
+    editable_msg = await state.get_value('edit_msg_id')
     await state.set_state(default_state)
-    return await msg.answer('Начнем сначала', reply_markup=ReplyKeyboardRemove())
+    if editable_msg:
+        await editable_msg.edit_text('Начнем сначала')
+    else:
+        await msg.answer('Начнем сначала', reply_markup=ReplyKeyboardRemove())
 
 
 
