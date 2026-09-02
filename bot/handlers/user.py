@@ -98,25 +98,30 @@ async def get_users_register_password(msg:Message, state: FSMContext):
     await msg.delete()
     editable_msg: Message = user_data.pop('edit_msg_id')
     name = msg.from_user.first_name
-    async with request(
-            'POST',
-            settings.user_register if 'email' in user_data else settings.login_user,
-            data=user_data
-    ) as req:
+    async with request('POST', settings.user_register, data=user_data) as req:
         url = req.url.human_repr().removesuffix(req.url.path)
         resp_token = await req.text()
-        if not resp_token:
-            resp_token = req.cookies.get('user-auth').value
     if resp_token:
-        await state.set_state(FSMAuthUser.login)
-        keyboard = link_keyboard(
-            url=url+f'/tg_redirect/{resp_token.strip('"')}/{user_data.get("email") or user_data.get("username")}'
-        )
-        await editable_msg.edit_text(
-            FINAL_BOT_MESSAGE['register'].format(name=name)
-            if 'email' in user_data else
-            FINAL_BOT_MESSAGE['login'].format(name=name),
-            reply_markup=keyboard
-    )
+        keyboard = link_keyboard(url=url+f'/tg_redirect/{resp_token.strip('"')}/{user_data.get("email")}')
+        await editable_msg.edit_text(FINAL_BOT_MESSAGE['register'].format(name=name), reply_markup=keyboard)
+        await state.clear()
     else:
-        await editable_msg.edit_text('Неверно указан пароль, повторите')
+        await editable_msg.edit_text('Неверно указан пароль, повторите ввод пароля')
+
+
+@user_router.message(FSMAuthUser.login_password_fill)
+async def get_users_login_password(msg:Message, state: FSMContext):
+    user_data = await state.get_data()
+    user_data['password'] = msg.text
+    await msg.delete()
+    editable_msg: Message = user_data.pop('edit_msg_id')
+    name = msg.from_user.first_name
+    async with request('POST', settings.login_user, data=user_data) as req:
+        url = req.url.human_repr().removesuffix(req.url.path)
+        resp_token = req.cookies.get('user-auth').value
+    if resp_token:
+        keyboard = link_keyboard(url=url+f'/tg_redirect/{resp_token.strip('"')}/{user_data.get("username")}')
+        await editable_msg.edit_text(FINAL_BOT_MESSAGE['login'].format(name=name), reply_markup=keyboard)
+        await state.clear()
+    else:
+        await editable_msg.edit_text('Неверно указан пароль, повторите ввод пароля')
