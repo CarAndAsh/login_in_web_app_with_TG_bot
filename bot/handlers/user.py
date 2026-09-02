@@ -87,10 +87,24 @@ async def get_users_email(msg:Message, state: FSMContext):
         await state.set_state(FSMAuthUser.register_password_fill)
 
 
+@user_router.callback_query(F.data == 'confirm_update_account')
+async def confirm_update_account_data(cbq: CallbackQuery, state: FSMContext):
+    await cbq.message.edit_text('Для подтверждения добавления данных введите пароль от аккаунта')
+    await state.set_state(FSMAuthUser.update_password_fill)
 
 
-@user_router.message(FSMAuthUser.password_fill)
-async def get_users_password(msg:Message, state: FSMContext):
+@user_router.callback_query(F.data == 'deny_update_account')
+async def deny_update_account_data(cbq: CallbackQuery, state: FSMContext):
+    await state.update_data({'email':None})
+    await cbq.message.edit_text('Введите ваш e-mail, зарегистрированный в системе')
+    await state.set_state(FSMAuthUser.email_fill)
+
+
+@user_router.message(FSMAuthUser.update_password_fill)
+async def update_account_data(msg: Message, state: FSMContext):
+    pass
+
+
 @user_router.message(FSMAuthUser.register_password_fill)
 async def get_users_register_password(msg:Message, state: FSMContext):
     user_data = await state.get_data()
