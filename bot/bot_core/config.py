@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     proxy: str
     user_register: str
     check_user_email: str
+    check_user_by_email: str
     login_user: str
 
 settings = Settings()

@@ -6,9 +6,8 @@ from fastapi.params import Body
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
 
-from app.crud import users_crud
-from app.crud.dependencies import get_user_email_by_tg_id
-from app.models import db_helper
+from app.crud import users_crud, get_user_email_by_tg_id, get_user_by_email
+from app.models import db_helper, User
 from app.schemas.user import UserSchema
 
 router = APIRouter(prefix='/users', tags=['Users'])
@@ -32,3 +31,14 @@ async def get_user_email(
 ) -> JSONResponse:
     user_email: str = await get_user_email_by_tg_id(session, telegram_id)
     return JSONResponse(content=user_email)
+
+
+@router.post('/user_by_email')
+async def get_user_data_by_email(
+        session: Annotated[AsyncSession, Depends(db_helper.session_getter)],
+        user_email: Annotated[str, Body()],
+) -> JSONResponse:
+    user: User | None = await get_user_by_email(session, user_email)
+    if user:
+        return JSONResponse(content={'email':user.email, 'telegram_id': user.telegram_id})
+    return JSONResponse(content={'email': None, 'telegram_id': None})
