@@ -16,6 +16,14 @@ async def get_user_email_by_tg_id(
     return query.scalar_one_or_none()
 
 
+async def get_user_by_email(
+        session: Annotated['AsyncSession', Depends(db_helper.session_getter)],
+        user_email: str) -> str | None:
+    query = await session.execute(select(User).filter(User.email == user_email))
+    res: User | None  = query.scalar_one_or_none()
+    return res
+
+
 async def get_users_db(
         session: Annotated['AsyncSession', Depends(db_helper.session_getter)]
 ) -> AsyncGenerator['AsyncSession', None]:
