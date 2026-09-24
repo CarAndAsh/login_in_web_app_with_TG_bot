@@ -1,3 +1,5 @@
+from bot.bot_core import settings
+
 BOT_INFO = {
     'name': 'Рег-бот',
     'short_desc': 'Бот для регистрации',
@@ -17,11 +19,11 @@ BOT_MENU = {
 FINAL_BOT_MESSAGE = {
     'login':'С возвращением, {name}! Перейдите в свой профиль по ссылке ниже',
     'register':'Благодарим за регистрацию, {name}. Перейдите в свой профиль по ссылке ниже'
+    'FSMAuthUser:register_password_fill':'Благодарим за регистрацию, {name}. Перейдите в свой профиль по ссылке ниже',
+    'FSMAuthUser:login_password_fill':'С возвращением, {name}! Перейдите в свой профиль по ссылке ниже',
 }
 
-STATE_INPUT_PLACEHOLDER = {
-    'default_state':'Вводите ТОЛЬКО команды(список в меню) или данные по запросу',
-    'FSMAuthUser:email_fill':'Введите e-mail',
-    'FSMAuthUser:password_fill':'Введите пароль',
-    'FSMAuthUser:confirm_pwd_fill':'Введите пароль еще раз'
+REQUEST_URL = {
+    'FSMAuthUser:register_password_fill':settings.user_register,
+    'FSMAuthUser:login_password_fill':settings.login_user,
 }
