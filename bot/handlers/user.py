@@ -5,12 +5,13 @@ from aiogram.filters import CommandStart, StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import default_state
 from aiogram.types import Message, ReplyKeyboardRemove, CallbackQuery
-from aiohttp import request, web_exceptions
+from aiohttp import web_exceptions
 
 from bot.bot_core import FSMAuthUser
 from bot.bot_core.config import settings
 from bot.keyboards.keyboards import reply_keyboard, link_keyboard, confirm_account_kb
-from bot.lexicon.lexicon_ru import FINAL_BOT_MESSAGE
+from bot.lexicon.lexicon_ru import FINAL_BOT_MESSAGE, REQUEST_URL
+from bot.utils.request_helper import request_helper
 
 user_router: Router = Router()
 
@@ -28,7 +29,6 @@ async def reset_fsm(msg: Message, state: FSMContext) -> None:
         await msg.answer('Начнем сначала', reply_markup=ReplyKeyboardRemove())
 
 
-
 @user_router.message(CommandStart(), StateFilter(default_state))
 async def startup(msg: Message, state: FSMContext) -> Message:
     await msg.delete()
@@ -44,11 +44,11 @@ async def get_user_data(cbq: CallbackQuery, state: FSMContext) -> Message:
     user_tg_id: int = user_data.pop('id')
     user_data['telegram_id'] = user_tg_id
 
-    async with request('POST', settings.check_user_email, json=user_tg_id) as req:
-        try:
-            user_email = await req.json()
-        except web_exceptions.HTTPException:
-           return await cbq.message.edit_text('Ошибка связи')
+    try:
+        response = await request_helper.post(settings.check_user_email, json=user_tg_id)
+        user_email = await response.json()
+    except web_exceptions.HTTPException:
+       return await cbq.message.edit_text('Ошибка связи')
 
     if user_email:
         await state.set_data({'username':user_email}) # fastapi-users needs e-mail as username
@@ -71,16 +71,17 @@ async def get_users_email(msg:Message, state: FSMContext):
     await msg.delete()
     editable_msg = await state.get_value('edit_msg_id')
     email = await state.get_value('email')
-    async with request('POST', settings.check_user_by_email, json=email) as req:
-        try:
-            response = await req.json()
-        except web_exceptions.HTTPException:
-           return editable_msg.edit_text('Ошибка связи')
-    if email == response['email'] and response['telegram_id'] is None:
+    try:
+        response = await request_helper.post(settings.check_user_by_email, json=email)
+        response_data = await response.json()
+    except web_exceptions.HTTPException:
+        return editable_msg.edit_text('Ошибка связи')
+
+    if email == response_data['email'] and response_data['telegram_id'] is None:
         await editable_msg.edit_text(
             'Аккаунт с таким e-mail уже существует. Если он ваш, добавить к нему данные из Telegram?',
         reply_markup=confirm_account_kb)
-    elif email == response['email'] and response['telegram_id'] != msg.from_user.id:
+    elif email == response_data['email'] and response_data['telegram_id'] != msg.from_user.id:
         await editable_msg.edit_text('Вы ввели e-mail существующего аккаунта, повторите ввод')
     else:
         await editable_msg.edit_text('e-mail принят, теперь введите пароль')
@@ -101,41 +102,23 @@ async def deny_update_account_data(cbq: CallbackQuery, state: FSMContext):
 
 
 @user_router.message(FSMAuthUser.update_password_fill)
-async def update_account_data(msg: Message, state: FSMContext):
-    pass
-
-
 @user_router.message(FSMAuthUser.register_password_fill)
-async def get_users_register_password(msg:Message, state: FSMContext):
-    user_data = await state.get_data()
-    user_data['password'] = msg.text
-    await msg.delete()
-    editable_msg: Message = user_data.pop('edit_msg_id')
-    name = msg.from_user.first_name
-    async with request('POST', settings.user_register, data=user_data) as req:
-        url = req.url.human_repr().removesuffix(req.url.path)
-        resp_token = await req.text()
-    if resp_token:
-        keyboard = link_keyboard(url=url+f'/tg_redirect/{resp_token.strip('"')}/{user_data.get("email")}')
-        await editable_msg.edit_text(FINAL_BOT_MESSAGE['register'].format(name=name), reply_markup=keyboard)
-        await state.clear()
-    else:
-        await editable_msg.edit_text('Неверно указан пароль, повторите ввод пароля')
-
-
 @user_router.message(FSMAuthUser.login_password_fill)
-async def get_users_login_password(msg:Message, state: FSMContext):
+async def get_users_password(msg:Message, state: FSMContext):
     user_data = await state.get_data()
     user_data['password'] = msg.text
     await msg.delete()
+    current_fsm_state = await state.get_state()
     editable_msg: Message = user_data.pop('edit_msg_id')
     name = msg.from_user.first_name
-    async with request('POST', settings.login_user, data=user_data) as req:
-        url = req.url.human_repr().removesuffix(req.url.path)
-        resp_token = req.cookies.get('user-auth').value
+    response = await request_helper.post(REQUEST_URL[current_fsm_state], data=user_data)
+
+    resp_token: str = response.cookies.get('user-auth').value
+    url = response.url.human_repr().removesuffix(response.url.path)
     if resp_token:
-        keyboard = link_keyboard(url=url+f'/tg_redirect/{resp_token.strip('"')}/{user_data.get("username")}')
-        await editable_msg.edit_text(FINAL_BOT_MESSAGE['login'].format(name=name), reply_markup=keyboard)
+        user_email = user_data.get("email") or user_data.get("username")
+        keyboard = link_keyboard(url=url+f'/tg_redirect/{resp_token.strip('"')}/{user_email}')
+        await editable_msg.edit_text(FINAL_BOT_MESSAGE[current_fsm_state].format(name=name), reply_markup=keyboard)
         await state.clear()
     else:
         await editable_msg.edit_text('Неверно указан пароль, повторите ввод пароля')
