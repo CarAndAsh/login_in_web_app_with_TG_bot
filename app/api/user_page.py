@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users import BaseUserManager
 from fastapi_users.authentication import JWTStrategy
 from starlette.datastructures import FormData
+from starlette.responses import HTMLResponse
 
 from app.api.dependencies.authentication import get_user_manager, get_jwt_strategy
 from app.api.auth import current_user
@@ -40,6 +41,21 @@ async def _(user_data: CreateUserSchema, user_manager: BaseUserManager):
         OAuth2PasswordRequestForm(username=user.email, password=user_data.password))
 
 
+@router.post('/register_by_telegram')
+async def register_by_telegram(
+        req: Request,
+        user_manager: Annotated[BaseUserManager, Depends(get_user_manager)],
+        strategy: Annotated[JWTStrategy, Depends(get_jwt_strategy)],
+):
+    user_data: FormData = await req.form()
+    valid_user_data = CreateUserSchema.model_validate(user_data)
+    user = await get_user(valid_user_data, user_manager)
+    response = HTMLResponse()
+    token = await strategy.write_token(user)
+    response.set_cookie(key=settings.cookie.name, value=token)
+    return response
+
+
 async def response_with_auth_cookie(req, strategy, user, user_email) -> RedirectResponse:
     response = RedirectResponse(req.url_for('user_page', email=user_email))
     token = await strategy.write_token(user)
@@ -54,17 +70,12 @@ async def auth_and_redirect_to_user_page(
         strategy: Annotated[JWTStrategy, Depends(get_jwt_strategy)],
 ):
     user_data: FormData = await req.form()
-    if not (submit := user_data.get('submit')):
-        valid_user_data = CreateUserSchema.model_validate(user_data)
-        user = await get_user(valid_user_data, user_manager)
-        return await strategy.write_token(user)
-    else:
-        if submit == 'Войти':
-            valid_user_data = LoginDataForm.model_validate(user_data)
-        elif submit == 'Зарегистрироваться':
-            valid_user_data = RegisterDataForm.model_validate(user_data)
-        user = await get_user(valid_user_data, user_manager)
-        return await response_with_auth_cookie(req, strategy, user, user.email)
+    if submit:= user_data['submit'] == 'Войти':
+        valid_user_data = LoginDataForm.model_validate(user_data)
+    elif submit == 'Зарегистрироваться':
+        valid_user_data = RegisterDataForm.model_validate(user_data)
+    user = await get_user(valid_user_data, user_manager)
+    return await response_with_auth_cookie(req, strategy, user, user.email)
 
 
 @router.post('/update_and_redirect_to_user_page', name='update_redirect')
