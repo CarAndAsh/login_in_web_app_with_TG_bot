@@ -23,4 +23,9 @@ class RequestHelper:
             return await session.post(url, **kwargs)
 
 
+    async def patch(self, url, **kwargs):
+        async with self as session:
+            return await session.patch(url, **kwargs)
+
+
 request_helper = RequestHelper()

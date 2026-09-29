@@ -38,5 +38,6 @@ class Settings(BaseSettings):
     check_user_email: str
     check_user_by_email: str
     login_user: str
+    update_user_data: str
 
 settings = Settings()
