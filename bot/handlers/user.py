@@ -110,7 +110,7 @@ async def get_users_password_for_update(msg: Message, state: FSMContext):
     editable_msg: Message = user_data.pop('edit_msg_id')
     name = msg.from_user.first_name
     response = await request_helper.post(settings.login_user, data={'username':user_data['email'],'password':user_data['password']})
-    url = response.url.human_repr().removesuffix(response.url.path)
+    url = response.url.parent.parent.human_repr()
     if resp_token := response.cookies.get('user-auth').value:
         response = await request_helper.patch(REQUEST_URL[current_fsm_state], json=user_data, cookies={'user-auth': resp_token})
         user_data = await response.json()
@@ -133,7 +133,7 @@ async def get_users_password(msg: Message, state: FSMContext):
     name = msg.from_user.first_name
     response = await request_helper.post(REQUEST_URL[current_fsm_state], data=user_data)
     resp_token: str = response.cookies.get('user-auth').value
-    url = response.url.human_repr().removesuffix(response.url.path)
+    url = response.url.parent.parent.human_repr()
     if resp_token:
         user_email = user_data.get("email") or user_data.get("username")
         keyboard = link_keyboard(url=url+f'/tg_redirect/{resp_token.strip('"')}/{user_email}')
