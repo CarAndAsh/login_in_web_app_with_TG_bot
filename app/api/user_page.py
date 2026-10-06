@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from fastapi_users import BaseUserManager
 from fastapi_users.authentication import JWTStrategy
 from starlette.datastructures import FormData
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, PlainTextResponse
 
 from app.api.dependencies.authentication import get_user_manager, get_jwt_strategy
 from app.api.auth import current_user
@@ -88,6 +88,11 @@ async def update_and_redirect_to_user_page(
 ):
     user = await user_manager.update(user_update=user_data, user=user)
     return await response_with_auth_cookie(req, strategy, user, user_data.email)
+
+
+@router.get('/auth_cookie_name', response_class=PlainTextResponse)
+async def auth_cookie_name():
+    return settings.cookie.name
 
 
 @router.get('/tg_redirect/{response_token:str}/{user_email:str}')

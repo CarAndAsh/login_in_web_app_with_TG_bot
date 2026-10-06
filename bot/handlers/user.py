@@ -103,15 +103,20 @@ async def deny_update_account_data(cbq: CallbackQuery, state: FSMContext):
 
 @user_router.message(FSMAuthUser.update_password_fill)
 async def get_users_password_for_update(msg: Message, state: FSMContext):
+    cookie_name: str | None = None
     user_data = await state.get_data()
     user_data['password'] = msg.text
     await msg.delete()
     current_fsm_state = await state.get_state()
     editable_msg: Message = user_data.pop('edit_msg_id')
     name = msg.from_user.first_name
+    if not cookie_name:
+        cookie_name_req = await request_helper.get(settings.get_cookie_name)
+        cookie_name = await cookie_name_req.text()
     response = await request_helper.post(settings.login_user, data={'username':user_data['email'],'password':user_data['password']})
+    resp_token: str = response.cookies.get(cookie_name).value
     url = response.url.parent.parent.human_repr()
-    if resp_token := response.cookies.get('user-auth').value:
+    if resp_token:
         response = await request_helper.patch(REQUEST_URL[current_fsm_state], json=user_data, cookies={'user-auth': resp_token})
         user_data = await response.json()
         user_email = user_data.get("email")
@@ -125,6 +130,7 @@ async def get_users_password_for_update(msg: Message, state: FSMContext):
 @user_router.message(FSMAuthUser.register_password_fill)
 @user_router.message(FSMAuthUser.login_password_fill)
 async def get_users_password(msg: Message, state: FSMContext):
+    cookie_name: str | None = None
     user_data = await state.get_data()
     user_data['password'] = msg.text
     await msg.delete()
@@ -132,7 +138,10 @@ async def get_users_password(msg: Message, state: FSMContext):
     editable_msg: Message = user_data.pop('edit_msg_id')
     name = msg.from_user.first_name
     response = await request_helper.post(REQUEST_URL[current_fsm_state], data=user_data)
-    resp_token: str = response.cookies.get('user-auth').value
+    if not cookie_name:
+        cookie_name_req = await request_helper.get(settings.get_cookie_name)
+        cookie_name = await cookie_name_req.text()
+    resp_token: str = response.cookies.get(cookie_name).value
     url = response.url.parent.parent.human_repr()
     if resp_token:
         user_email = user_data.get("email") or user_data.get("username")
