@@ -31,6 +31,9 @@ class UserForm(StarletteForm):
     submit = SubmitField('Сохранить')
 
 
+FormTypes = UserForm | RegisterForm | LoginForm
+
+
 class LoginDataForm(BaseModel):
     email: str
     password: str
