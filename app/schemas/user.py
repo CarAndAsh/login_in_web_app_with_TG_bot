@@ -5,7 +5,7 @@ from pydantic import EmailStr, BaseModel, ConfigDict
 # TODO something for hide 'id' field
 
 class TelegramUserSchema(BaseModel):
-    telegram_id: int | None = None
+    telegram_id: str | None = None
     is_bot: bool = False
     first_name: str | None = None
     last_name: str | None = None
@@ -26,5 +26,5 @@ class PartialUpdateUserSchema(BaseUserUpdate, UserSchema, TelegramUserSchema):
 
 class CreateUserSchema(UserSchema, BaseUserCreate, TelegramUserSchema):
     id : None = None
-    telegram_id: int | None = None
+    telegram_id: str | None = None
     language_code: str | None = None

@@ -18,7 +18,7 @@ class Base(DeclarativeBase):
 
 # columns can't be changed while use sqlite3 - ALTER COLUNM not supported
 class User(IdIntPkMixin, Base, SQLAlchemyBaseUserTable[int]):
-    telegram_id: Mapped[int] = mapped_column(BigInteger, nullable=True, unique=True)
+    telegram_id: Mapped[str] = mapped_column(String(length=10), nullable=True, unique=True)
     is_bot: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     first_name: Mapped[str] = mapped_column(String(length=50), nullable=True)
     last_name: Mapped[str] = mapped_column(String(length=100), nullable=True)
